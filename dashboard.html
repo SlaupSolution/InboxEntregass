@@ -1,0 +1,130 @@
+import React, { useState } from 'react';
+import { Home, Box, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+
+const DashboardCard = ({ title, value, icon, color }) => {
+  return (
+    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex flex-col h-full">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-sm font-medium text-gray-600">{title}</h3>
+        <div className={`p-2 rounded-full ${color}`}>
+          {icon}
+        </div>
+      </div>
+      <h2 className="text-3xl font-bold">{value}</h2>
+    </div>
+  );
+};
+
+const Dashboard = () => {
+  const [deliveries] = useState([
+    // Empty initially, would be populated with real data
+  ]);
+  
+  return (
+    <div className="flex min-h-screen bg-gray-50">
+      {/* Sidebar */}
+      <div className="w-56 bg-white border-r border-gray-200">
+        <div className="p-4 border-b border-gray-200">
+          <div className="flex items-center">
+            <div className="mr-2 text-blue-600">
+              <Box size={20} />
+            </div>
+            <h1 className="text-lg font-semibold">Inbox Entregas</h1>
+          </div>
+        </div>
+        
+        <div className="p-2">
+          <h2 className="px-4 py-2 text-sm font-medium text-gray-600">Menu</h2>
+          
+          <a href="/dashboard" className="flex items-center px-4 py-3 text-sm text-gray-700 bg-gray-100 rounded-md">
+            <Home size={18} className="mr-3" />
+            Dashboard
+          </a>
+          
+          <a href="/entregas" className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 rounded-md mt-1">
+            <Box size={18} className="mr-3" />
+            Entregas
+          </a>
+        </div>
+      </div>
+      
+      {/* Main content */}
+      <div className="flex-1 p-8">
+        <h1 className="text-2xl font-bold mb-8">Dashboard</h1>
+        
+        {/* Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <DashboardCard 
+            title="Total Entregas" 
+            value="3" 
+            icon={<Box size={20} className="text-blue-600" />}
+            color="bg-blue-50"
+          />
+          
+          <DashboardCard 
+            title="Em Trânsito" 
+            value="1" 
+            icon={<Clock size={20} className="text-blue-600" />}
+            color="bg-blue-50"
+          />
+          
+          <DashboardCard 
+            title="Entregues" 
+            value="1" 
+            icon={<CheckCircle size={20} className="text-green-600" />}
+            color="bg-green-50"
+          />
+          
+          <DashboardCard 
+            title="Pendentes" 
+            value="1" 
+            icon={<AlertCircle size={20} className="text-yellow-600" />}
+            color="bg-yellow-50"
+          />
+        </div>
+        
+        {/* Recent Deliveries */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-lg font-bold">Entregas Recentes</h2>
+            <a 
+              href="/entregas" 
+              className="text-sm text-blue-600 hover:text-blue-800"
+            >
+              Ver todas as entregas
+            </a>
+          </div>
+          
+          {deliveries.length > 0 ? (
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left pb-3 text-sm font-medium text-gray-600">Código</th>
+                  <th className="text-left pb-3 text-sm font-medium text-gray-600">Cliente</th>
+                  <th className="text-left pb-3 text-sm font-medium text-gray-600">Status</th>
+                  <th className="text-left pb-3 text-sm font-medium text-gray-600">Data</th>
+                </tr>
+              </thead>
+              <tbody>
+                {deliveries.map((delivery, index) => (
+                  <tr key={index} className="border-b border-gray-100">
+                    <td className="py-3 text-sm">{delivery.code}</td>
+                    <td className="py-3 text-sm">{delivery.customer}</td>
+                    <td className="py-3 text-sm">{delivery.status}</td>
+                    <td className="py-3 text-sm">{delivery.date}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div className="text-center py-10 text-gray-500">
+              Nenhuma entrega recente disponível
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Dashboard;

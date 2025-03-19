@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INBOX Entregas - Renda Extra</title>
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary: #ffde59;
+            --dark: #222222;
+            --gray: #f5f5f5;
+            --white: #ffffff;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--gray);
+        }
+        
+        header {
+            background-color: var(--primary);
+            padding: 16px;
+            box-shadow: var(--shadow);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            font-size: 24px;
+            color: var(--dark);
+        }
+        
+        .logo img {
+            height: 40px;
+        }
+        
+        .entrar-btn {
+            background-color: var(--dark);
+            color: var(--white);
+            padding: 12px 24px;
+            border: none;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .entrar-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+        
+        .hero {
+            margin-top: 80px;
+            padding: 60px 0;
+            background-color: var(--primary);
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 36px;
+            margin-bottom: 16px;
+            color: var(--dark);
+        }
+        
+        .hero p {
+            font-size: 18px;
+            margin-bottom: 32px;
+            color: var(--dark);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .entregas-section {
+            padding: 40px 0;
+        }
+        
+        .section-title {
+            font-size: 24px;
+            margin-bottom: 24px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .entregas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+        }
+        
+        .entrega-card {
+            background-color: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s;
+        }
+        
+        .entrega-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            background-color: var(--primary);
+            padding: 16px;
+            color: var(--dark);
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .valor {
+            font-size: 20px;
+        }
+        
+        .card-body {
+            padding: 16px;
+        }
+        
+        .endereco {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .endereco-icon {
+            min-width: 24px;
+            height: 24px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .distancia {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 16px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .aceitar-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-top: 16px;
+            background-color: var(--primary);
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .aceitar-btn:hover {
+            background-color: var(--dark);
+            color: var(--white);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            background-color: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+        
+        .empty-state img {
+            width: 100px;
+            margin-bottom: 16px;
+        }
+        
+        footer {
+            background-color: var(--dark);
+            color: var(--white);
+            padding: 24px 0;
+            text-align: center;
+            margin-top: 40px;
+        }
+        
+        /* Modal de login */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: var(--white);
+            border-radius: 12px;
+            padding: 24px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: var(--shadow);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 28px;
+            }
+            
+            .hero p {
+                font-size: 16px;
+            }
+            
+            .entregas-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <img src="/api/placeholder/40/40" alt="INBOX Entregas Logo">
+                    INBOX Entregas
+                </div>
+                <button class="entrar-btn" onclick="openLoginModal()">Entrar</button>
+            </div>
+        </div>
+    </header>
+    
+    <section class="hero">
+        <div class="container">
+            <h1>Ganhe dinheiro fazendo entregas</h1>
+            <p>Seja um entregador parceiro da INBOX Entregas e tenha liberdade para escolher quando e quanto trabalhar.</p>
+            <button class="entrar-btn" onclick="openLoginModal()">Começar Agora</button>
+        </div>
+    </section>
+    
+    <section class="entregas-section">
+        <div class="container">
+            <h2 class="section-title">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                </svg>
+                Entregas Disponíveis
+            </h2>
+            
+            <div class="loading" id="loading">
+                Carregando entregas disponíveis...
+            </div>
+            
+            <div class="entregas-grid" id="entregas-container">
+                <!-- As entregas serão carregadas do Supabase aqui -->
+            </div>
+        </div>
+    </section>
+    
+    <!-- Modal de Login -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Entrar</h3>
+                <button class="close-btn" onclick="closeLoginModal()">&times;</button>
+            </div>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="entrar-btn" style="width: 100%;">Entrar</button>
+                <p style="text-align: center; margin-top: 16px;">
+                    Não tem uma conta? <a href="#" onclick="showSignupForm()">Cadastre-se</a>
+                </p>
+            </form>
+            
+            <form id="signupForm" onsubmit="handleSignup(event)" style="display: none;">
+                <div class="form-group">
+                    <label for="signupName">Nome Completo</label>
+                    <input type="text" id="signupName" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Senha</label>
+                    <input type="password" id="signupPassword" required>
+                </div>
+                <button type="submit" class="entrar-btn" style="width: 100%;">Cadastrar</button>
+                <p style="text-align: center; margin-top: 16px;">
+                    Já tem uma conta? <a href="#" onclick="showLoginForm()">Faça login</a>
+                </p>
+            </form>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 INBOX Entregas. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Inicializar cliente Supabase
+        // Substitua estas credenciais pelas suas próprias do projeto Supabase
+        const SUPABASE_URL = 'https://awbtsseratdujnjxncii.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3YnRzc2VyYXRkdWpuanhuY2lpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI0MjIxNDgsImV4cCI6MjA1Nzk5ODE0OH0.SMOziWy5bknJoHjeTceGev233888xhumygRgGisRylY';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // Estado do usuário
+        let currentUser = null;
+        
+        // Verificar se o usuário está logado ao carregar a página
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Mostrar o indicador de carregamento
+            document.getElementById('loading').style.display = 'block';
+            
+            // Verificar sessão do usuário
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                currentUser = user;
+                updateUIForLoggedInUser();
+            }
+            
+            // Carregar entregas disponíveis
+            await loadEntregas();
+            
+            // Esconder o indicador de carregamento
+            document.getElementById('loading').style.display = 'none';
+        });
+        
+        // Carregar entregas do Supabase
+        async function loadEntregas() {
+            try {
+                const { data, error } = await supabase
+                    .from('entregas')
+                    .select('*')
+                    .eq('status', 'disponivel');
+                
+                if (error) throw error;
+                
+                const container = document.getElementById('entregas-container');
+                
+                if (data.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <img src="/api/placeholder/100/100" alt="Nenhuma entrega">
+                            <h3>Nenhuma entrega disponível no momento</h3>
+                            <p>Volte mais tarde para novas oportunidades</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = '';
+                
+                data.forEach(entrega => {
+                    const card = document.createElement('div');
+                    card.className = 'entrega-card';
+                    card.innerHTML = `
+                        <div class="card-header">
+                            <span>${entrega.tipo}</span>
+                            <span class="valor">R$ ${entrega.valor.toFixed(2)}</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="endereco">
+                                <div class="endereco-icon">A</div>
+                                <div>
+                                    <strong>Coleta</strong>
+                                    <p>${entrega.endereco_coleta}</p>
+                                </div>
+                            </div>
+                            <div class="endereco">
+                                <div class="endereco-icon">B</div>
+                                <div>
+                                    <strong>Entrega</strong>
+                                    <p>${entrega.endereco_entrega}</p>
+                                </div>
+                            </div>
+                            <div class="distancia">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                                Estimativa: ${entrega.tempo_estimado} min (${entrega.distancia} km)
+                            </div>
+                            <button class="aceitar-btn" onclick="aceitarEntrega('${entrega.id}')">Aceitar Entrega</button>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Erro ao carregar entregas:', error);
+                document.getElementById('entregas-container').innerHTML = `
+                    <div class="empty-state">
+                        <h3>Erro ao carregar entregas</h3>
+                        <p>Ocorreu um problema ao carregar as entregas disponíveis</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Função para aceitar uma entrega
+        async function aceitarEntrega(entregaId) {
+            if (!currentUser) {
+                openLoginModal();
+                return;
+            }
+            
+            try {
+                const { error } = await supabase
+                    .from('entregas')
+                    .update({
+                        status: 'em_andamento',
+                        entregador_id: currentUser.id,
+                        data_aceite: new Date()
+                    })
+                    .eq('id', entregaId);
+                
+                if (error) throw error;
+                
+                alert('Entrega aceita com sucesso!');
+                await loadEntregas(); // Recarregar entregas disponíveis
+            } catch (error) {
+                console.error('Erro ao aceitar entrega:', error);
+                alert('Erro ao aceitar entrega. Tente novamente.');
+            }
+        }
+        
+        // Funções do modal de login
+        function openLoginModal() {
+            document.getElementById('loginModal').style.display = 'flex';
+        }
+        
+        function closeLoginModal() {
+            document.getElementById('loginModal').style.display = 'none';
+        }
+        
+        function showSignupForm() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('signupForm').style.display = 'block';
+        }
+        
+        function showLoginForm() {
+            document.getElementById('signupForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        }
+        
+        // Login de usuário
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email,
+                    password
+                });
+                
+                if (error) throw error;
+                
+                currentUser = data.user;
+                closeLoginModal();
+                updateUIForLoggedInUser();
+                alert('Login realizado com sucesso!');
+            } catch (error) {
+                console.error('Erro no login:', error);
+                alert('Erro no login: ' + error.message);
+            }
+        }
+        
+        // Cadastro de usuário
+        async function handleSignup(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            
+            try {
+                // Criar usuário na autenticação
+                const { data, error } = await supabase.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: {
+                            full_name: name
+                        }
+                    }
+                });
+                
+                if (error) throw error;
+                
+                // Adicionar informações do usuário na tabela entregadores
+                const { error: profileError } = await supabase
+                    .from('entregadores')
+                    .insert([
+                        {
+                            id: data.user.id,
+                            nome: name,
+                            email: email,
+                            data_cadastro: new Date()
+                        }
+                    ]);
+                
+                if (profileError) throw profileError;
+                
+                currentUser = data.user;
+                closeLoginModal();
+                updateUIForLoggedInUser();
+                alert('Cadastro realizado com sucesso!');
+            } catch (error) {
+                console.error('Erro no cadastro:', error);
+                alert('Erro no cadastro: ' + error.message);
+            }
+        }
+        
+        // Atualizar a UI para usuário logado
+        function updateUIForLoggedInUser() {
+            const loginBtns = document.querySelectorAll('.entrar-btn');
+            loginBtns.forEach(btn => {
+                if (btn.parentElement.className === 'header-content') {
+                    btn.textContent = 'Minha Conta';
+                    btn.onclick = () => { window.location.href = '/perfil.html'; };
+                }
+            });
+        }
+    </script>
+</body>
+</html>
