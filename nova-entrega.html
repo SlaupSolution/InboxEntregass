@@ -22,48 +22,28 @@
         }
         
         body {
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: var(--gray);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
         }
         
-        .modal {
+        .container {
             background-color: var(--white);
+            padding: 40px;
             border-radius: 8px;
-            width: 100%;
-            max-width: 600px;
             box-shadow: var(--shadow);
-            overflow: hidden;
+            max-width: 500px;
+            width: 100%;
         }
         
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .modal-title {
-            font-size: 18px;
+        .title {
+            font-size: 1.5rem;
             font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 20px;
-            cursor: pointer;
-            color: #666;
-        }
-        
-        .modal-body {
-            padding: 20px;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
         }
         
         .form-group {
@@ -74,7 +54,7 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
-            font-size: 14px;
+            color: #333;
         }
         
         .form-control {
@@ -85,235 +65,124 @@
             font-size: 14px;
         }
         
-        .form-control:focus {
-            outline: none;
-            border-color: var(--blue);
-            box-shadow: 0 0 0 2px rgba(51, 102, 255, 0.2);
-        }
-        
-        .form-row {
-            display: flex;
-            gap: 20px;
-        }
-        
-        .form-col {
-            flex: 1;
-        }
-        
-        .items-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        
-        .add-item-btn {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            background-color: var(--white);
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 6px 12px;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        
-        .add-item-btn:hover {
-            background-color: #f5f5f5;
-        }
-        
-        .item-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        
-        .item-description {
-            flex: 1;
-        }
-        
-        .item-quantity {
-            width: 80px;
-        }
-        
-        .modal-footer {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            padding: 20px;
-            border-top: 1px solid #eee;
-        }
-        
         .btn {
-            padding: 10px 16px;
-            border-radius: 4px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
+            width: 100%;
+            padding: 10px;
+            background-color: #ffde59;
+            color: #222;
             border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
         }
         
-        .btn-cancel {
-            background-color: var(--white);
-            border: 1px solid #ddd;
-            color: var(--dark);
-        }
-        
-        .btn-cancel:hover {
-            background-color: #f5f5f5;
-        }
-        
-        .btn-primary {
-            background-color: var(--blue);
-            color: var(--white);
-        }
-        
-        .btn-primary:hover {
-            background-color: #2952cc;
-        }
-        
-        textarea.form-control {
-            min-height: 100px;
-            resize: vertical;
+        .btn:hover {
+            background-color: #222;
+            color: #fff;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar cliente Supabase
+            const SUPABASE_URL = "https://awbtsseratdujnjxncii.supabase.co";
+            const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3YnRzc2VyYXRkdWpuanhuY2lpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI0MjIxNDgsImV4cCI6MjA1Nzk5ODE0OH0.SMOziWy5bknJoHjeTceGev233888xhumygRgGisRylY";
+            const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+            window.handleSubmit = async function(event) {
+                event.preventDefault();
+                
+                const nomeCliente = document.getElementById('nomeCliente').value;
+                const telefone = document.getElementById('telefone').value;
+                const enderecoColeta = document.getElementById('enderecoColeta').value;
+                const enderecoEntrega = document.getElementById('enderecoEntrega').value;
+                const observacoes = document.getElementById('observacoes').value;
+                
+                const itensRows = document.querySelectorAll('.item-row');
+                const itens = [];
+                
+                itensRows.forEach(row => {
+                    const descricao = row.querySelector('.item-description').value;
+                    const quantidade = row.querySelector('.item-quantity').value;
+                    
+                    if (descricao) {
+                        itens.push({
+                            descricao,
+                            quantidade
+                        });
+                    }
+                });
+                
+                const novaEntrega = {
+                    cliente: {
+                        nome: nomeCliente,
+                        telefone: telefone
+                    },
+                    enderecoColeta,
+                    enderecoEntrega,
+                    itens,
+                    observacoes,
+                    status: "Pendente",
+                    data: new Date().toLocaleDateString('pt-BR')
+                };
+                
+                try {
+                    const { error } = await supabase
+                        .from('entregas')
+                        .insert([novaEntrega]);
+                    
+                    if (error) throw error;
+                    
+                    alert('Entrega criada com sucesso!');
+                    document.getElementById('sheetmonkey-form').submit(); // Envia os dados para o SheetMonkey
+                    window.location.href = 'entregas-disponiveis.html';
+                    
+                } catch (error) {
+                    console.error('Erro ao criar entrega:', error);
+                    alert('Erro ao criar entrega: ' + error.message);
+                }
+            }
+        });
+    </script>
 </head>
 <body>
-    <div class="modal">
-        <div class="modal-header">
-            <div class="modal-title">
-                <span>📦</span> Nova Entrega
+    <div class="container">
+        <h1 class="title">Nova Entrega</h1>
+        <form id="sheetmonkey-form" action="https://api.sheetmonkey.io/form/867grA4DJN2Ajki2P9MWFL" method="post" onsubmit="handleSubmit(event)">
+            <div class="form-group">
+                <label for="nomeCliente" class="form-label">Nome do Cliente</label>
+                <input type="text" id="nomeCliente" name="Nome do Cliente" class="form-control" required>
             </div>
-            <button class="close-btn" onclick="window.location.href='entregas-disponiveis.html'">&times;</button>
-        </div>
-        
-        <form id="novaEntregaForm" onsubmit="handleSubmit(event)">
-            <div class="modal-body">
-                <div class="form-row">
-                    <div class="form-col">
-                        <div class="form-group">
-                            <label class="form-label">Nome do Cliente</label>
-                            <input type="text" class="form-control" id="nomeCliente" required>
-                        </div>
-                    </div>
-                    <div class="form-col">
-                        <div class="form-group">
-                            <label class="form-label">Telefone</label>
-                            <input type="text" class="form-control" id="telefone" required>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Endereço de Coleta</label>
-                    <input type="text" class="form-control" id="enderecoColeta" required>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Endereço de Entrega</label>
-                    <input type="text" class="form-control" id="enderecoEntrega" required>
-                </div>
-                
-                <div class="form-group">
-                    <div class="items-header">
-                        <label class="form-label">Itens</label>
-                        <button type="button" class="add-item-btn" onclick="adicionarItem()">
-                            <span>+</span> Adicionar Item
-                        </button>
-                    </div>
-                    
-                    <div id="itensContainer">
-                        <div class="item-row">
-                            <input type="text" class="form-control item-description" placeholder="Descrição do item">
-                            <input type="number" class="form-control item-quantity" value="1" min="1">
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Observações</label>
-                    <textarea class="form-control" id="observacoes"></textarea>
-                </div>
+            <div class="form-group">
+                <label for="telefone" class="form-label">Telefone</label>
+                <input type="tel" id="telefone" name="Telefone" class="form-control" required>
             </div>
-            
-            <div class="modal-footer">
-                <button type="button" class="btn btn-cancel" onclick="window.location.href='entregas-disponiveis.html'">Cancelar</button>
-                <button type="submit" class="btn btn-primary">Criar Entrega</button>
+            <div class="form-group">
+                <label for="enderecoColeta" class="form-label">Endereço de Coleta</label>
+                <input type="text" id="enderecoColeta" name="Endereço de Coleta" class="form-control" required>
             </div>
+            <div class="form-group">
+                <label for="enderecoEntrega" class="form-label">Endereço de Entrega</label>
+                <input type="text" id="enderecoEntrega" name="Endereço de Entrega" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="observacoes" class="form-label">Observações</label>
+                <textarea id="observacoes" name="Observações" class="form-control"></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Itens</label>
+                <div id="itensContainer">
+                    <div class="item-row">
+                        <input type="text" class="form-control item-description" placeholder="Descrição do item" name="Descrição do Item">
+                        <input type="number" class="form-control item-quantity" value="1" min="1" name="Quantidade">
+                    </div>
+                </div>
+                <button type="button" onclick="adicionarItem()">Adicionar Item</button>
+            </div>
+            <input type="hidden" name="Created" value="x-sheetmonkey-current-date-time" />
+            <button type="submit" class="btn">Criar Entrega</button>
         </form>
     </div>
-    
-    <script>
-        // Inicializar cliente Supabase
-        const SUPABASE_URL = "https://awbtsseratdujnjxncii.supabase.co";
-        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3YnRzc2VyYXRkdWpuanhuY2lpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI0MjIxNDgsImV4cCI6MjA1Nzk5ODE0OH0.SMOziWy5bknJoHjeTceGev233888xhumygRgGisRylY";
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        function adicionarItem() {
-            const container = document.getElementById('itensContainer');
-            const novaLinha = document.createElement('div');
-            novaLinha.className = 'item-row';
-            novaLinha.innerHTML = `
-                <input type="text" class="form-control item-description" placeholder="Descrição do item">
-                <input type="number" class="form-control item-quantity" value="1" min="1">
-            `;
-            container.appendChild(novaLinha);
-        }
-        
-        // Função para criar nova entrega
-        async function handleSubmit(event) {
-            event.preventDefault();
-            
-            const nomeCliente = document.getElementById('nomeCliente').value;
-            const telefone = document.getElementById('telefone').value;
-            const enderecoColeta = document.getElementById('enderecoColeta').value;
-            const enderecoEntrega = document.getElementById('enderecoEntrega').value;
-            const observacoes = document.getElementById('observacoes').value;
-            
-            const itensRows = document.querySelectorAll('.item-row');
-            const itens = [];
-            
-            itensRows.forEach(row => {
-                const descricao = row.querySelector('.item-description').value;
-                const quantidade = row.querySelector('.item-quantity').value;
-                
-                if (descricao) {
-                    itens.push({
-                        descricao,
-                        quantidade
-                    });
-                }
-            });
-            
-            const novaEntrega = {
-                cliente: {
-                    nome: nomeCliente,
-                    telefone: telefone
-                },
-                enderecoColeta,
-                enderecoEntrega,
-                itens,
-                observacoes,
-                status: "Pendente",
-                data: new Date().toLocaleDateString('pt-BR')
-            };
-            
-            try {
-                const { error } = await supabase
-                    .from('entregas')
-                    .insert([novaEntrega]);
-                
-                if (error) throw error;
-                
-                alert('Entrega criada com sucesso!');
-                window.location.href = 'entregas-disponiveis.html';
-                
-            } catch (error) {
-                console.error('Erro ao criar entrega:', error);
-                alert('Erro ao criar entrega: ' + error.message);
-            }
-        }
-    </script>
 </body>
 </html> 
