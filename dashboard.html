@@ -52,6 +52,19 @@ const Dashboard = () => {
       <div className="flex-1 p-8">
         <h1 className="text-2xl font-bold mb-8">Dashboard</h1>
         
+        {/* Navigation Buttons */}
+        <div className="mb-8">
+          <a href="/entregas" className="inline-block bg-blue-600 text-white px-4 py-2 rounded-md mr-2 hover:bg-blue-700">
+            Ir para Entregas
+          </a>
+          <a href="/login" className="inline-block bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">
+            Voltar para Login
+          </a>
+          <a href="/entregas-disponiveis" className="inline-block bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
+            Ver Entregas Disponíveis
+          </a>
+        </div>
+        
         {/* Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <DashboardCard 

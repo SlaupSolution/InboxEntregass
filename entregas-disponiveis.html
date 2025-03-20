@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entregas Disponíveis - INBOX Entregas</title>
+    <link rel="stylesheet" href="path/to/your/styles.css"> <!-- Certifique-se de ajustar o caminho -->
+</head>
+<body>
+    <div class="flex min-h-screen bg-gray-50">
+        <!-- Sidebar -->
+        <div class="w-56 bg-white border-r border-gray-200">
+            <div class="p-4 border-b border-gray-200">
+                <div class="flex items-center">
+                    <div class="mr-2 text-blue-600">
+                        <Box size={20} />
+                    </div>
+                    <h1 class="text-lg font-semibold">Inbox Entregas</h1>
+                </div>
+            </div>
+            
+            <div class="p-2">
+                <h2 class="px-4 py-2 text-sm font-medium text-gray-600">Menu</h2>
+                
+                <a href="/dashboard" class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 rounded-md">
+                    <Home size={18} class="mr-3" />
+                    Dashboard
+                </a>
+                
+                <a href="/entregas" class="flex items-center px-4 py-3 text-sm text-gray-700 bg-gray-100 rounded-md mt-1">
+                    <Box size={18} class="mr-3" />
+                    Entregas
+                </a>
+            </div>
+        </div>
+        
+        <!-- Main content -->
+        <div class="flex-1 p-8">
+            <h1 class="text-2xl font-bold mb-8">Entregas Disponíveis</h1>
+            
+            <!-- Back Button -->
+            <div class="mb-8">
+                <a href="/dashboard" class="inline-block bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">
+                    Voltar para Dashboard
+                </a>
+            </div>
+            
+            <!-- Deliveries Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Exemplo de card de entrega -->
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex flex-col">
+                    <h3 class="text-lg font-bold mb-2">Entrega #INB123456</h3>
+                    <p class="text-sm text-gray-600 mb-4">Cliente: João Silva</p>
+                    <p class="text-sm text-gray-600 mb-4">Endereço: Avenida Principal, 456</p>
+                    <p class="text-sm text-gray-600 mb-4">Data: 19/03/2025</p>
+                    <button class="mt-auto bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                        Aceitar Entrega
+                    </button>
+                </div>
+                <!-- Adicione mais cards conforme necessário -->
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
