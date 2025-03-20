@@ -4,60 +4,232 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Entregas Disponíveis - INBOX Entregas</title>
-    <link rel="stylesheet" href="path/to/your/styles.css"> <!-- Certifique-se de ajustar o caminho -->
+    <style>
+        :root {
+            --primary: #ffde59;
+            --dark: #222222;
+            --gray: #f5f5f5;
+            --white: #ffffff;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+            --blue: #3366ff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--gray);
+            min-height: 100vh;
+            display: flex;
+        }
+        
+        .sidebar {
+            width: 220px;
+            background-color: var(--white);
+            border-right: 1px solid #e5e5e5;
+            padding: 20px 0;
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid #e5e5e5;
+            margin-bottom: 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            font-size: 18px;
+            color: var(--dark);
+        }
+        
+        .logo-icon {
+            width: 24px;
+            height: 24px;
+            background-color: var(--primary);
+            border-radius: 4px;
+        }
+        
+        .menu-title {
+            padding: 0 20px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            color: var(--dark);
+            text-decoration: none;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .menu-item.active {
+            background-color: #f0f0f0;
+            font-weight: 500;
+        }
+        
+        .menu-item:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .menu-icon {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 30px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .btn {
+            padding: 10px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background-color: var(--blue);
+            color: var(--white);
+        }
+        
+        .btn-primary:hover {
+            background-color: #2952cc;
+        }
+        
+        .btn-secondary {
+            background-color: var(--gray);
+            color: var(--dark);
+            border: 1px solid #ddd;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e5e5e5;
+        }
+        
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .card {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .card-info {
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .card-actions {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-    <div class="flex min-h-screen bg-gray-50">
-        <!-- Sidebar -->
-        <div class="w-56 bg-white border-r border-gray-200">
-            <div class="p-4 border-b border-gray-200">
-                <div class="flex items-center">
-                    <div class="mr-2 text-blue-600">
-                        <Box size={20} />
-                    </div>
-                    <h1 class="text-lg font-semibold">Inbox Entregas</h1>
-                </div>
-            </div>
-            
-            <div class="p-2">
-                <h2 class="px-4 py-2 text-sm font-medium text-gray-600">Menu</h2>
-                
-                <a href="/dashboard" class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 rounded-md">
-                    <Home size={18} class="mr-3" />
-                    Dashboard
-                </a>
-                
-                <a href="/entregas" class="flex items-center px-4 py-3 text-sm text-gray-700 bg-gray-100 rounded-md mt-1">
-                    <Box size={18} class="mr-3" />
-                    Entregas
-                </a>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <div class="logo-icon"></div>
+                Inbox Entregas
             </div>
         </div>
         
-        <!-- Main content -->
-        <div class="flex-1 p-8">
-            <h1 class="text-2xl font-bold mb-8">Entregas Disponíveis</h1>
-            
-            <!-- Back Button -->
-            <div class="mb-8">
-                <a href="/dashboard" class="inline-block bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">
-                    Voltar para Dashboard
-                </a>
+        <div class="menu-title">Menu</div>
+        
+        <a href="dashboard.html" class="menu-item">
+            <div class="menu-icon">🏠</div>
+            Dashboard
+        </a>
+        
+        <a href="entregas-disponiveis.html" class="menu-item active">
+            <div class="menu-icon">📦</div>
+            Entregas
+        </a>
+    </div>
+    
+    <div class="main-content">
+        <div class="header">
+            <h1 class="page-title">Entregas Disponíveis</h1>
+            <a href="nova-entrega.html" class="btn btn-primary">+ Nova Entrega</a>
+        </div>
+        
+        <a href="dashboard.html" class="btn btn-secondary" style="margin-bottom: 20px;">
+            Voltar para Dashboard
+        </a>
+        
+        <div class="cards-container">
+            <div class="card">
+                <h3 class="card-title">Entrega #INB123456</h3>
+                <p class="card-info"><strong>Cliente:</strong> João Silva</p>
+                <p class="card-info"><strong>Telefone:</strong> (11) 98765-4321</p>
+                <p class="card-info"><strong>Endereço:</strong> Avenida Principal, 456</p>
+                <p class="card-info"><strong>Data:</strong> 19/03/2025</p>
+                <div class="card-actions">
+                    <button class="btn btn-primary">Aceitar Entrega</button>
+                </div>
             </div>
             
-            <!-- Deliveries Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Exemplo de card de entrega -->
-                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex flex-col">
-                    <h3 class="text-lg font-bold mb-2">Entrega #INB123456</h3>
-                    <p class="text-sm text-gray-600 mb-4">Cliente: João Silva</p>
-                    <p class="text-sm text-gray-600 mb-4">Endereço: Avenida Principal, 456</p>
-                    <p class="text-sm text-gray-600 mb-4">Data: 19/03/2025</p>
-                    <button class="mt-auto bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-                        Aceitar Entrega
-                    </button>
+            <div class="card">
+                <h3 class="card-title">Entrega #INB789012</h3>
+                <p class="card-info"><strong>Cliente:</strong> Maria Oliveira</p>
+                <p class="card-info"><strong>Telefone:</strong> (11) 91234-5678</p>
+                <p class="card-info"><strong>Endereço:</strong> Rua das Flores, 123</p>
+                <p class="card-info"><strong>Data:</strong> 19/03/2025</p>
+                <div class="card-actions">
+                    <button class="btn btn-primary">Aceitar Entrega</button>
                 </div>
-                <!-- Adicione mais cards conforme necessário -->
+            </div>
+            
+            <div class="card">
+                <h3 class="card-title">Entrega #INB345678</h3>
+                <p class="card-info"><strong>Cliente:</strong> Pedro Santos</p>
+                <p class="card-info"><strong>Telefone:</strong> (11) 95555-9999</p>
+                <p class="card-info"><strong>Endereço:</strong> Avenida Central, 789</p>
+                <p class="card-info"><strong>Data:</strong> 19/03/2025</p>
+                <div class="card-actions">
+                    <button class="btn btn-primary">Aceitar Entrega</button>
+                </div>
             </div>
         </div>
     </div>

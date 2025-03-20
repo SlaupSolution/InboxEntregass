@@ -1,143 +1,261 @@
-import React, { useState } from 'react';
-import { Home, Box, CheckCircle, Clock, AlertCircle } from 'lucide-react';
-
-const DashboardCard = ({ title, value, icon, color }) => {
-  return (
-    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex flex-col h-full">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-sm font-medium text-gray-600">{title}</h3>
-        <div className={`p-2 rounded-full ${color}`}>
-          {icon}
-        </div>
-      </div>
-      <h2 className="text-3xl font-bold">{value}</h2>
-    </div>
-  );
-};
-
-const Dashboard = () => {
-  const [deliveries] = useState([
-    // Empty initially, would be populated with real data
-  ]);
-  
-  return (
-    <div className="flex min-h-screen bg-gray-50">
-      {/* Sidebar */}
-      <div className="w-56 bg-white border-r border-gray-200">
-        <div className="p-4 border-b border-gray-200">
-          <div className="flex items-center">
-            <div className="mr-2 text-blue-600">
-              <Box size={20} />
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - INBOX Entregas</title>
+    <style>
+        :root {
+            --primary: #ffde59;
+            --dark: #222222;
+            --gray: #f5f5f5;
+            --white: #ffffff;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--gray);
+            min-height: 100vh;
+            display: flex;
+        }
+        
+        .sidebar {
+            width: 220px;
+            background-color: var(--white);
+            border-right: 1px solid #e5e5e5;
+            padding: 20px 0;
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid #e5e5e5;
+            margin-bottom: 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            font-size: 18px;
+            color: var(--dark);
+        }
+        
+        .logo-icon {
+            width: 24px;
+            height: 24px;
+            background-color: var(--primary);
+            border-radius: 4px;
+        }
+        
+        .menu-title {
+            padding: 0 20px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            color: var(--dark);
+            text-decoration: none;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .menu-item.active {
+            background-color: #f0f0f0;
+            font-weight: 500;
+        }
+        
+        .menu-item:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .menu-icon {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 30px;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+        
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .card-title {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .card-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .icon-box {
+            background-color: #e6f0ff;
+        }
+        
+        .icon-transit {
+            background-color: #e6f0ff;
+        }
+        
+        .icon-delivered {
+            background-color: #e6ffe6;
+        }
+        
+        .icon-pending {
+            background-color: #fff9e6;
+        }
+        
+        .card-value {
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
+        .recent-deliveries {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+        
+        .recent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .recent-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .view-all {
+            color: #4a89dc;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 0;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <div class="logo-icon"></div>
+                Inbox Entregas
             </div>
-            <h1 className="text-lg font-semibold">Inbox Entregas</h1>
-          </div>
         </div>
         
-        <div className="p-2">
-          <h2 className="px-4 py-2 text-sm font-medium text-gray-600">Menu</h2>
-          
-          <a href="/dashboard" className="flex items-center px-4 py-3 text-sm text-gray-700 bg-gray-100 rounded-md">
-            <Home size={18} className="mr-3" />
+        <div class="menu-title">Menu</div>
+        
+        <a href="dashboard.html" class="menu-item active">
+            <div class="menu-icon">🏠</div>
             Dashboard
-          </a>
-          
-          <a href="/entregas" className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 rounded-md mt-1">
-            <Box size={18} className="mr-3" />
+        </a>
+        
+        <a href="entregas-disponiveis.html" class="menu-item">
+            <div class="menu-icon">📦</div>
             Entregas
-          </a>
-        </div>
-      </div>
-      
-      {/* Main content */}
-      <div className="flex-1 p-8">
-        <h1 className="text-2xl font-bold mb-8">Dashboard</h1>
-        
-        {/* Navigation Buttons */}
-        <div className="mb-8">
-          <a href="/entregas" className="inline-block bg-blue-600 text-white px-4 py-2 rounded-md mr-2 hover:bg-blue-700">
-            Ir para Entregas
-          </a>
-          <a href="/login" className="inline-block bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">
-            Voltar para Login
-          </a>
-          <a href="/entregas-disponiveis" className="inline-block bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
-            Ver Entregas Disponíveis
-          </a>
-        </div>
-        
-        {/* Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <DashboardCard 
-            title="Total Entregas" 
-            value="3" 
-            icon={<Box size={20} className="text-blue-600" />}
-            color="bg-blue-50"
-          />
-          
-          <DashboardCard 
-            title="Em Trânsito" 
-            value="1" 
-            icon={<Clock size={20} className="text-blue-600" />}
-            color="bg-blue-50"
-          />
-          
-          <DashboardCard 
-            title="Entregues" 
-            value="1" 
-            icon={<CheckCircle size={20} className="text-green-600" />}
-            color="bg-green-50"
-          />
-          
-          <DashboardCard 
-            title="Pendentes" 
-            value="1" 
-            icon={<AlertCircle size={20} className="text-yellow-600" />}
-            color="bg-yellow-50"
-          />
-        </div>
-        
-        {/* Recent Deliveries */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-bold">Entregas Recentes</h2>
-            <a 
-              href="/entregas" 
-              className="text-sm text-blue-600 hover:text-blue-800"
-            >
-              Ver todas as entregas
-            </a>
-          </div>
-          
-          {deliveries.length > 0 ? (
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left pb-3 text-sm font-medium text-gray-600">Código</th>
-                  <th className="text-left pb-3 text-sm font-medium text-gray-600">Cliente</th>
-                  <th className="text-left pb-3 text-sm font-medium text-gray-600">Status</th>
-                  <th className="text-left pb-3 text-sm font-medium text-gray-600">Data</th>
-                </tr>
-              </thead>
-              <tbody>
-                {deliveries.map((delivery, index) => (
-                  <tr key={index} className="border-b border-gray-100">
-                    <td className="py-3 text-sm">{delivery.code}</td>
-                    <td className="py-3 text-sm">{delivery.customer}</td>
-                    <td className="py-3 text-sm">{delivery.status}</td>
-                    <td className="py-3 text-sm">{delivery.date}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <div className="text-center py-10 text-gray-500">
-              Nenhuma entrega recente disponível
-            </div>
-          )}
-        </div>
-      </div>
+        </a>
     </div>
-  );
-};
-
-export default Dashboard;
+    
+    <div class="main-content">
+        <h1 class="page-title">Dashboard</h1>
+        
+        <div class="cards-container">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Total Entregas</div>
+                    <div class="card-icon icon-box">📦</div>
+                </div>
+                <div class="card-value">3</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Em Trânsito</div>
+                    <div class="card-icon icon-transit">🚚</div>
+                </div>
+                <div class="card-value">1</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Entregues</div>
+                    <div class="card-icon icon-delivered">✅</div>
+                </div>
+                <div class="card-value">1</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Pendentes</div>
+                    <div class="card-icon icon-pending">⏱️</div>
+                </div>
+                <div class="card-value">1</div>
+            </div>
+        </div>
+        
+        <div class="recent-deliveries">
+            <div class="recent-header">
+                <div class="recent-title">Entregas Recentes</div>
+                <a href="entregas-disponiveis.html" class="view-all">Ver todas as entregas</a>
+            </div>
+            
+            <div class="empty-state">
+                Nenhuma entrega recente disponível
+            </div>
+        </div>
+    </div>
+</body>
+</html>
