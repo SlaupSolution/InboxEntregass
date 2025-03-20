@@ -74,46 +74,48 @@
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Inicializar cliente Supabase
-        const SUPABASE_URL = "https://awbtsseratdujnjxncii.supabase.co";
-        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3YnRzc2VyYXRkdWpuanhuY2lpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI0MjIxNDgsImV4cCI6MjA1Nzk5ODE0OH0.SMOziWy5bknJoHjeTceGev233888xhumygRgGisRylY";
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar cliente Supabase
+            const SUPABASE_URL = "https://awbtsseratdujnjxncii.supabase.co";
+            const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3YnRzc2VyYXRkdWpuanhuY2lpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI0MjIxNDgsImV4cCI6MjA1Nzk5ODE0OH0.SMOziWy5bknJoHjeTceGev233888xhumygRgGisRylY";
+            const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        async function handleSignup(event) {
-            event.preventDefault();
-            const nome = document.getElementById('nome').value;
-            const telefone = document.getElementById('telefone').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
+            window.handleSignup = async function(event) {
+                event.preventDefault();
+                const nome = document.getElementById('nome').value;
+                const telefone = document.getElementById('telefone').value;
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
 
-            if (password !== confirmPassword) {
-                alert('As senhas não conferem');
-                return;
-            }
+                if (password !== confirmPassword) {
+                    alert('As senhas não conferem');
+                    return;
+                }
 
-            try {
-                const { error } = await supabase.auth.signUp({
-                    email,
-                    password,
-                    options: {
-                        data: {
-                            full_name: nome,
-                            phone: telefone
+                try {
+                    const { error } = await supabase.auth.signUp({
+                        email,
+                        password,
+                        options: {
+                            data: {
+                                full_name: nome,
+                                phone: telefone
+                            }
                         }
-                    }
-                });
+                    });
 
-                if (error) throw error;
+                    if (error) throw error;
 
-                alert('Cadastro realizado com sucesso! Verifique seu email para confirmar sua conta.');
-                window.location.href = 'login-page.html';
+                    alert('Cadastro realizado com sucesso! Verifique seu email para confirmar sua conta.');
+                    window.location.href = 'login-page.html';
 
-            } catch (error) {
-                console.error('Erro no cadastro:', error);
-                alert('Erro no cadastro: ' + error.message);
+                } catch (error) {
+                    console.error('Erro no cadastro:', error);
+                    alert('Erro no cadastro: ' + error.message);
+                }
             }
-        }
+        });
     </script>
 </head>
 <body>
