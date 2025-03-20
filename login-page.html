@@ -71,28 +71,6 @@
             padding: 32px 24px;
         }
         
-        .tabs {
-            display: flex;
-            margin-bottom: 24px;
-            border-bottom: 2px solid var(--gray);
-        }
-        
-        .tab {
-            flex: 1;
-            text-align: center;
-            padding: 12px;
-            cursor: pointer;
-            font-weight: bold;
-            color: #999;
-            transition: all 0.3s;
-        }
-        
-        .tab.active {
-            color: var(--dark);
-            border-bottom: 3px solid var(--primary);
-            margin-bottom: -2px;
-        }
-        
         .form-group {
             margin-bottom: 20px;
         }
@@ -235,14 +213,6 @@
             text-decoration: underline;
         }
         
-        .form-container {
-            display: none;
-        }
-        
-        .form-container.active {
-            display: block;
-        }
-        
         .alert {
             padding: 12px 16px;
             border-radius: 8px;
@@ -323,6 +293,21 @@
         .btn-loading .spinner {
             display: inline-block;
         }
+        
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .register-link a {
+            color: var(--dark);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .register-link a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -348,87 +333,53 @@
             </div>
             
             <div class="login-body">
-                <div class="tabs">
-                    <div class="tab active" id="login-tab" onclick="switchTab('login')">Login</div>
-                    <div class="tab" id="cadastro-tab" onclick="switchTab('cadastro')">Cadastro</div>
-                </div>
+                <h2 style="text-align: center; margin-bottom: 20px;">Login</h2>
                 
                 <div class="alert alert-danger" id="error-message"></div>
                 <div class="alert alert-success" id="success-message"></div>
                 
-                <div class="form-container active" id="login-form">
-                    <form onsubmit="handleLogin(event)">
-                        <div class="form-group">
-                            <label for="email">Email</label>
-                            <input type="email" class="form-control" id="email" placeholder="Seu email" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="password">Senha</label>
-                            <input type="password" class="form-control" id="password" placeholder="Sua senha" required>
-                        </div>
-                        
-                        <div class="forgot-password">
-                            <a href="#" onclick="showResetPassword()">Esqueceu a senha?</a>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary" id="login-btn">
-                            <span class="spinner"></span>
-                            Entrar
-                        </button>
-                    </form>
-                    
-                    <div class="divider">
-                        <span>ou continue com</span>
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" placeholder="Seu email" required>
                     </div>
                     
-                    <div class="social-login">
-                        <button class="social-btn" onclick="loginWithGoogle()">
-                            <img src="/api/placeholder/20/20" alt="Google">
-                            Google
-                        </button>
-                        <button class="social-btn" onclick="loginWithFacebook()">
-                            <img src="/api/placeholder/20/20" alt="Facebook">
-                            Facebook
-                        </button>
+                    <div class="form-group">
+                        <label for="password">Senha</label>
+                        <input type="password" class="form-control" id="password" placeholder="Sua senha" required>
                     </div>
+                    
+                    <div class="forgot-password">
+                        <a href="#" onclick="showResetPassword()">Esqueceu a senha?</a>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" id="login-btn">
+                        <span class="spinner"></span>
+                        Entrar
+                    </button>
+                </form>
+                
+                <div class="register-link">
+                    Não tem uma conta? <a href="cadastro.html">Cadastre-se</a>
                 </div>
                 
-                <div class="form-container" id="cadastro-form">
-                    <form onsubmit="handleSignup(event)">
-                        <div class="form-group">
-                            <label for="nome">Nome Completo</label>
-                            <input type="text" class="form-control" id="nome" placeholder="Seu nome completo" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="telefone">Telefone</label>
-                            <input type="tel" class="form-control" id="telefone" placeholder="(00) 00000-0000" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="signupEmail">Email</label>
-                            <input type="email" class="form-control" id="signupEmail" placeholder="Seu email" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="signupPassword">Senha</label>
-                            <input type="password" class="form-control" id="signupPassword" placeholder="Crie uma senha" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="confirmPassword">Confirmar Senha</label>
-                            <input type="password" class="form-control" id="confirmPassword" placeholder="Confirme sua senha" required>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary" id="signup-btn">
-                            <span class="spinner"></span>
-                            Cadastrar
-                        </button>
-                    </form>
+                <div class="divider">
+                    <span>ou continue com</span>
                 </div>
                 
-                <div class="form-container" id="reset-form">
+                <div class="social-login">
+                    <button class="social-btn" onclick="loginWithGoogle()">
+                        <img src="/api/placeholder/20/20" alt="Google">
+                        Google
+                    </button>
+                    <button class="social-btn" onclick="loginWithFacebook()">
+                        <img src="/api/placeholder/20/20" alt="Facebook">
+                        Facebook
+                    </button>
+                </div>
+                
+                <div id="reset-form" style="display: none; margin-top: 20px;">
+                    <h3 style="margin-bottom: 15px;">Recuperar Senha</h3>
                     <form onsubmit="handlePasswordReset(event)">
                         <div class="form-group">
                             <label for="resetEmail">Email</label>
@@ -440,7 +391,7 @@
                             Recuperar Senha
                         </button>
                         
-                        <button type="button" class="btn btn-outline" onclick="showLoginForm()">
+                        <button type="button" class="btn btn-outline" onclick="hideResetForm()">
                             Voltar para o Login
                         </button>
                     </form>
@@ -461,8 +412,8 @@
 
     <script>
         // Inicializar cliente Supabase
-        const SUPABASE_URL = https://awbtsseratdujnjxncii.supabase.co
-        const SUPABASE_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3YnRzc2VyYXRkdWpuanhuY2lpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI0MjIxNDgsImV4cCI6MjA1Nzk5ODE0OH0.SMOziWy5bknJoHjeTceGev233888xhumygRgGisRylY';
+        const SUPABASE_URL = "https://awbtsseratdujnjxncii.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3YnRzc2VyYXRkdWpuanhuY2lpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI0MjIxNDgsImV4cCI6MjA1Nzk5ODE0OH0.SMOziWy5bknJoHjeTceGev233888xhumygRgGisRylY";
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         
         // Verificar se o usuário já está logado
@@ -474,39 +425,6 @@
                 window.location.href = 'dashboard.html';
             }
         });
-        
-        // Alternar entre as abas de login e cadastro
-        function switchTab(tab) {
-            // Esconder mensagens
-            hideMessages();
-            
-            // Atualizar classes das abas
-            document.getElementById('login-tab').classList.remove('active');
-            document.getElementById('cadastro-tab').classList.remove('active');
-            document.getElementById(`${tab}-tab`).classList.add('active');
-            
-            // Atualizar visibilidade dos formulários
-            document.getElementById('login-form').classList.remove('active');
-            document.getElementById('cadastro-form').classList.remove('active');
-            document.getElementById('reset-form').classList.remove('active');
-            document.getElementById(`${tab}-form`).classList.add('active');
-        }
-        
-        // Mostrar formulário de recuperação de senha
-        function showResetPassword() {
-            hideMessages();
-            document.getElementById('login-form').classList.remove('active');
-            document.getElementById('cadastro-form').classList.remove('active');
-            document.getElementById('reset-form').classList.add('active');
-        }
-        
-        // Voltar para o formulário de login
-        function showLoginForm() {
-            hideMessages();
-            document.getElementById('login-form').classList.add('active');
-            document.getElementById('cadastro-form').classList.remove('active');
-            document.getElementById('reset-form').classList.remove('active');
-        }
         
         // Esconder mensagens de erro e sucesso
         function hideMessages() {
@@ -573,75 +491,15 @@
             }
         }
         
-        // Cadastro de usuário
-        async function handleSignup(event) {
-            event.preventDefault();
+        // Mostrar formulário de recuperação de senha
+        function showResetPassword() {
             hideMessages();
-            setLoading('signup-btn', true);
-            
-            const nome = document.getElementById('nome').value;
-            const telefone = document.getElementById('telefone').value;
-            const email = document.getElementById('signupEmail').value;
-            const password = document.getElementById('signupPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            
-            // Validar senha
-            if (password !== confirmPassword) {
-                showError('As senhas não conferem');
-                setLoading('signup-btn', false);
-                return;
-            }
-            
-            try {
-                // Criar usuário na autenticação
-                const { data, error } = await supabase.auth.signUp({
-                    email,
-                    password,
-                    options: {
-                        data: {
-                            full_name: nome,
-                            phone: telefone
-                        }
-                    }
-                });
-                
-                if (error) throw error;
-                
-                // Adicionar informações do usuário na tabela entregadores
-                const { error: profileError } = await supabase
-                    .from('entregadores')
-                    .insert([
-                        {
-                            id: data.user.id,
-                            nome: nome,
-                            email: email,
-                            telefone: telefone,
-                            data_cadastro: new Date()
-                        }
-                    ]);
-                
-                if (profileError) throw profileError;
-                
-                showSuccess('Cadastro realizado com sucesso! Verifique seu email para confirmar sua conta.');
-                
-                // Limpar formulário
-                document.getElementById('nome').value = '';
-                document.getElementById('telefone').value = '';
-                document.getElementById('signupEmail').value = '';
-                document.getElementById('signupPassword').value = '';
-                document.getElementById('confirmPassword').value = '';
-                
-                // Voltar para a tela de login após um tempo
-                setTimeout(() => {
-                    switchTab('login');
-                }, 3000);
-                
-            } catch (error) {
-                console.error('Erro no cadastro:', error);
-                showError('Erro no cadastro: ' + error.message);
-            } finally {
-                setLoading('signup-btn', false);
-            }
+            document.getElementById('reset-form').style.display = 'block';
+        }
+        
+        // Esconder formulário de recuperação de senha
+        function hideResetForm() {
+            document.getElementById('reset-form').style.display = 'none';
         }
         
         // Recuperação de senha
