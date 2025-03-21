@@ -27,6 +27,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            position: relative;
         }
         
         .container {
@@ -81,6 +82,19 @@
             background-color: #222;
             color: #fff;
         }
+
+        .notification {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #4caf50;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: none;
+            z-index: 1000;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
@@ -134,22 +148,34 @@
                     
                     if (error) throw error;
                     
-                    alert('Entrega criada com sucesso!');
-                    document.getElementById('sheetmonkey-form').submit(); // Envia os dados para o SheetMonkey
-                    window.location.href = 'entregas-disponiveis.html';
+                    showNotification('Entrega criada com sucesso!');
+                    document.getElementById('sheetdb-form').submit(); // Envia os dados para o SheetDB
+                    setTimeout(() => {
+                        window.location.href = 'entregas-disponiveis.html';
+                    }, 2000);
                     
                 } catch (error) {
                     console.error('Erro ao criar entrega:', error);
                     alert('Erro ao criar entrega: ' + error.message);
                 }
             }
+
+            function showNotification(message) {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.style.display = 'block';
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 3000);
+            }
         });
     </script>
 </head>
 <body>
+    <div class="notification" id="notification"></div>
     <div class="container">
         <h1 class="title">Nova Entrega</h1>
-        <form id="sheetmonkey-form" action="https://api.sheetmonkey.io/form/867grA4DJN2Ajki2P9MWFL" method="post" onsubmit="handleSubmit(event)">
+        <form id="sheetdb-form" action="https://sheetdb.io/api/v1/apg9vpi656ts8" method="post" onsubmit="handleSubmit(event)">
             <div class="form-group">
                 <label for="nomeCliente" class="form-label">Nome do Cliente</label>
                 <input type="text" id="nomeCliente" name="Nome do Cliente" class="form-control" required>

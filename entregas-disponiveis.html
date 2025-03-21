@@ -175,6 +175,21 @@
             text-decoration: underline;
         }
     </style>
+    <script src="https://sheetdb.io/handlebars.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('https://sheetdb.io/api/v1/apg9vpi656ts8')
+                .then(response => response.json())
+                .then(data => {
+                    const source = document.getElementById('entregas-template').innerHTML;
+                    const template = Handlebars.compile(source);
+                    const context = { entregas: data };
+                    const html = template(context);
+                    document.getElementById('entregas-container').innerHTML = html;
+                })
+                .catch(error => console.error('Erro ao buscar dados:', error));
+        });
+    </script>
 </head>
 <body>
     <div class="sidebar">
@@ -208,43 +223,26 @@
             Voltar para Dashboard
         </a>
         
-        <div class="cards-container">
-            <div class="card">
-                <h3 class="card-title">Entrega #INB123456</h3>
-                <p class="card-info"><strong>Cliente:</strong> João Silva</p>
-                <p class="card-info"><strong>Telefone:</strong> (11) 98765-4321</p>
-                <p class="card-info"><strong>Endereço:</strong> Avenida Principal, 456</p>
-                <p class="card-info"><strong>Data:</strong> 19/03/2025</p>
-                <p class="card-info"><strong>Status:</strong> <a href="entregas-concluidas.html" class="status-link">Concluída</a></p>
-                <div class="card-actions">
-                    <button class="btn btn-primary">Aceitar Entrega</button>
-                </div>
-            </div>
-            
-            <div class="card">
-                <h3 class="card-title">Entrega #INB789012</h3>
-                <p class="card-info"><strong>Cliente:</strong> Maria Oliveira</p>
-                <p class="card-info"><strong>Telefone:</strong> (11) 91234-5678</p>
-                <p class="card-info"><strong>Endereço:</strong> Rua das Flores, 123</p>
-                <p class="card-info"><strong>Data:</strong> 19/03/2025</p>
-                <p class="card-info"><strong>Status:</strong> <a href="entregas-pendentes.html" class="status-link">Pendente</a></p>
-                <div class="card-actions">
-                    <button class="btn btn-primary">Aceitar Entrega</button>
-                </div>
-            </div>
-            
-            <div class="card">
-                <h3 class="card-title">Entrega #INB345678</h3>
-                <p class="card-info"><strong>Cliente:</strong> Pedro Santos</p>
-                <p class="card-info"><strong>Telefone:</strong> (11) 95555-9999</p>
-                <p class="card-info"><strong>Endereço:</strong> Avenida Central, 789</p>
-                <p class="card-info"><strong>Data:</strong> 19/03/2025</p>
-                <p class="card-info"><strong>Status:</strong> <a href="entregas-concluidas.html" class="status-link">Concluída</a></p>
-                <div class="card-actions">
-                    <button class="btn btn-primary">Aceitar Entrega</button>
-                </div>
-            </div>
+        <div id="entregas-container" class="cards-container">
+            <!-- Entregas serão renderizadas aqui -->
         </div>
     </div>
+
+    <!-- Template Handlebars -->
+    <script id="entregas-template" type="text/x-handlebars-template">
+        {{#each entregas}}
+        <div class="card">
+            <h3 class="card-title">Entrega #{{id}}</h3>
+            <p class="card-info"><strong>Cliente:</strong> {{cliente.nome}}</p>
+            <p class="card-info"><strong>Telefone:</strong> {{cliente.telefone}}</p>
+            <p class="card-info"><strong>Endereço:</strong> {{enderecoEntrega}}</p>
+            <p class="card-info"><strong>Data:</strong> {{data}}</p>
+            <p class="card-info"><strong>Status:</strong> <a href="#" class="status-link">{{status}}</a></p>
+            <div class="card-actions">
+                <button class="btn btn-primary">Aceitar Entrega</button>
+            </div>
+        </div>
+        {{/each}}
+    </script>
 </body>
 </html> 
