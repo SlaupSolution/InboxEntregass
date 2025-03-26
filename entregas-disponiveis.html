@@ -176,18 +176,33 @@
         }
     </style>
     <script src="https://sheetdb.io/handlebars.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            fetch('https://sheetdb.io/api/v1/apg9vpi656ts8')
-                .then(response => response.json())
-                .then(data => {
+            // Inicializar cliente Supabase
+            const SUPABASE_URL = "https://awbtsseratdujnjxncii.supabase.co";
+            const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3YnRzc2VyYXRkdWpuanhuY2lpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI0MjIxNDgsImV4cCI6MjA1Nzk5ODE0OH0.SMOziWy5bknJoHjeTceGev233888xhumygRgGisRylY";
+            const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+            async function carregarEntregas() {
+                try {
+                    const { data, error } = await supabase
+                        .from('entregas')
+                        .select('*');
+
+                    if (error) throw error;
+
                     const source = document.getElementById('entregas-template').innerHTML;
                     const template = Handlebars.compile(source);
                     const context = { entregas: data };
                     const html = template(context);
                     document.getElementById('entregas-container').innerHTML = html;
-                })
-                .catch(error => console.error('Erro ao buscar dados:', error));
+                } catch (error) {
+                    console.error('Erro ao buscar entregas:', error);
+                }
+            }
+
+            carregarEntregas();
         });
     </script>
 </head>
@@ -210,6 +225,11 @@
         <a href="entregas-disponiveis.html" class="menu-item active">
             <div class="menu-icon">📦</div>
             Entregas
+        </a>
+        
+        <a href="cadastro-entregador.html" class="menu-item">
+            <div class="menu-icon">👤</div>
+            Cadastrar Entregador
         </a>
     </div>
     

@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>INBOX Entregas - Página Inicial</title>
-    <link rel="stylesheet" href="path/to/your/styles.css"> <!-- Certifique-se de ajustar o caminho -->
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -20,10 +19,26 @@
             padding: 20px;
             text-align: center;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            position: relative;
         }
         header h1 {
             margin: 0;
             color: #222;
+        }
+        nav {
+            background-color: #222;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+        }
+        nav a {
+            color: #fff;
+            margin: 0 15px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        nav a:hover {
+            text-decoration: underline;
         }
         .container {
             flex: 1;
@@ -51,20 +66,6 @@
             color: #666;
             margin-bottom: 30px;
         }
-        .card a {
-            display: inline-block;
-            margin: 10px;
-            padding: 10px 20px;
-            background-color: #ffde59;
-            color: #222;
-            text-decoration: none;
-            border-radius: 8px;
-            transition: background-color 0.3s;
-        }
-        .card a:hover {
-            background-color: #222;
-            color: #fff;
-        }
         .search-container {
             margin-top: 20px;
             text-align: center;
@@ -77,7 +78,7 @@
             border-radius: 4px;
             margin-bottom: 10px;
         }
-        .search-button {
+        .search-button, .register-button {
             padding: 10px 20px;
             background-color: #ffde59;
             color: #222;
@@ -85,8 +86,9 @@
             border-radius: 4px;
             cursor: pointer;
             transition: background-color 0.3s;
+            margin-top: 10px;
         }
-        .search-button:hover {
+        .search-button:hover, .register-button:hover {
             background-color: #222;
             color: #fff;
         }
@@ -101,7 +103,6 @@
         function trackDelivery() {
             const trackingNumber = document.getElementById('trackingNumber').value;
             if (trackingNumber) {
-                // Aqui você pode implementar a lógica para buscar a entrega pelo número de rastreamento
                 alert('Buscando entrega com número: ' + trackingNumber);
                 // Exemplo: redirecionar para uma página de resultados
                 // window.location.href = `/resultados.html?tracking=${trackingNumber}`;
@@ -110,25 +111,29 @@
             }
         }
     </script>
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 </head>
 <body>
     <header>
         <h1>INBOX Entregas</h1>
     </header>
     
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="contato.html">Contato</a>
+        <a href="sobre.html">Sobre</a>
+    </nav>
+    
     <div class="container">
         <div class="card">
             <h2>Bem-vindo ao INBOX Entregas</h2>
-            <p>Escolha uma das opções abaixo para navegar pelo site.</p>
-            <a href="/login-page.html">Login</a>
-            <a href="/dashboard.html">Dashboard</a>
-            <a href="/entregas-disponiveis.html">Entregas Disponíveis</a>
-            <a href="homepage.html">Ir para Home</a>
+            <p>Use o campo abaixo para rastrear sua entrega.</p>
         </div>
         
         <div class="search-container">
             <input type="text" id="trackingNumber" class="search-input" placeholder="Digite o número de rastreamento">
             <button class="search-button" onclick="trackDelivery()">Rastrear Entrega</button>
+            <button class="register-button" onclick="window.location.href='nova-entrega.html'">Cadastrar Entrega</button>
         </div>
     </div>
     
