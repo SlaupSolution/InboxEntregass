@@ -134,18 +134,29 @@
             const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3YnRzc2VyYXRkdWpuanhuY2lpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI0MjIxNDgsImV4cCI6MjA1Nzk5ODE0OH0.SMOziWy5bknJoHjeTceGev233888xhumygRgGisRylY";
             const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-            // Carregar coletas existentes
+            // Função para carregar coletas
             async function carregarColetas() {
                 try {
+                    console.log('Carregando coletas...');
                     const { data, error } = await supabase
                         .from('coletas')
                         .select('*')
                         .order('data_criacao', { ascending: false });
 
-                    if (error) throw error;
+                    if (error) {
+                        console.error('Erro ao buscar coletas:', error);
+                        throw error;
+                    }
+
+                    console.log('Coletas carregadas:', data);
 
                     const listaColetas = document.getElementById('coletas-list');
                     listaColetas.innerHTML = '';
+
+                    if (data.length === 0) {
+                        listaColetas.innerHTML = '<p>Nenhuma coleta cadastrada.</p>';
+                        return;
+                    }
 
                     data.forEach(coleta => {
                         const coletaElement = document.createElement('div');
@@ -156,8 +167,9 @@
                                 <p><strong>Descrição:</strong> ${coleta.descricao}</p>
                                 <p><strong>Local de Coleta:</strong> ${coleta.local_coleta}</p>
                                 <p><strong>Local de Entrega:</strong> ${coleta.local_entrega}</p>
+                                <p><strong>Data:</strong> ${new Date(coleta.data_criacao).toLocaleString()}</p>
                             </div>
-                            <button class="btn btn-danger" onclick="deletarColeta('${coleta.id}')">Deletar</button>
+                            <button class="btn btn-danger" onclick="deletarColeta(${coleta.id})">Deletar</button>
                         `;
                         listaColetas.appendChild(coletaElement);
                     });
@@ -167,7 +179,7 @@
                 }
             }
 
-            // Cadastrar nova coleta
+            // Função para cadastrar nova coleta
             window.handleSubmit = async function(event) {
                 event.preventDefault();
                 
@@ -177,7 +189,8 @@
                 const localEntrega = document.getElementById('localEntrega').value;
                 
                 try {
-                    const { error } = await supabase
+                    console.log('Cadastrando nova coleta...');
+                    const { data, error } = await supabase
                         .from('coletas')
                         .insert([{
                             titulo,
@@ -185,13 +198,18 @@
                             local_coleta: localColeta,
                             local_entrega: localEntrega,
                             data_criacao: new Date().toISOString()
-                        }]);
+                        }])
+                        .select();
                     
-                    if (error) throw error;
+                    if (error) {
+                        console.error('Erro ao inserir:', error);
+                        throw error;
+                    }
                     
+                    console.log('Coleta cadastrada:', data);
                     alert('Coleta cadastrada com sucesso!');
                     document.getElementById('form-coleta').reset();
-                    carregarColetas();
+                    await carregarColetas();
                     
                 } catch (error) {
                     console.error('Erro ao cadastrar coleta:', error);
@@ -199,10 +217,11 @@
                 }
             }
 
-            // Deletar coleta
+            // Função para deletar coleta
             window.deletarColeta = async function(id) {
                 if (confirm('Tem certeza que deseja deletar esta coleta?')) {
                     try {
+                        console.log('Deletando coleta:', id);
                         const { error } = await supabase
                             .from('coletas')
                             .delete()
@@ -210,8 +229,9 @@
                         
                         if (error) throw error;
                         
+                        console.log('Coleta deletada com sucesso');
                         alert('Coleta deletada com sucesso!');
-                        carregarColetas();
+                        await carregarColetas();
                         
                     } catch (error) {
                         console.error('Erro ao deletar coleta:', error);

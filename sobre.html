@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sobre - INBOX Entregas</title>
+    <style>
+        :root {
+            --primary: #ffde59;
+            --dark: #222222;
+            --gray: #f5f5f5;
+            --white: #ffffff;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--gray);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background-color: var(--primary);
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        
+        .about-card {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+        
+        .about-title {
+            font-size: 2rem;
+            color: var(--dark);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .about-content {
+            line-height: 1.6;
+            color: #444;
+            margin-bottom: 20px;
+        }
+        
+        .features-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+        
+        .features-list li {
+            margin: 10px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .features-list li:before {
+            content: "✓";
+            color: #4CAF50;
+            position: absolute;
+            left: 0;
+        }
+        
+        .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: var(--dark);
+            color: var(--white);
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        
+        .back-button:hover {
+            background-color: #444;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>INBOX Entregas</h1>
+    </div>
+    
+    <div class="container">
+        <div class="about-card">
+            <h2 class="about-title">Sobre Nós</h2>
+            
+            <div class="about-content">
+                <p>A INBOX Entregas é uma plataforma inovadora que conecta entregadores e clientes na região Nordeste do Brasil, criando oportunidades de renda extra e soluções eficientes para entregas.</p>
+                
+                <p>Nossa missão é facilitar o dia a dia das pessoas, oferecendo um serviço de entregas confiável e ao mesmo tempo gerando oportunidades de trabalho para nossa comunidade.</p>
+                
+                <h3 style="margin: 20px 0;">Por que escolher a INBOX Entregas?</h3>
+                
+                <ul class="features-list">
+                    <li>Oportunidade de renda extra flexível</li>
+                    <li>Atendimento em toda região Nordeste</li>
+                    <li>Sistema simples e fácil de usar</li>
+                    <li>Suporte dedicado via WhatsApp</li>
+                    <li>Pagamentos seguros e transparentes</li>
+                    <li>Entregas rápidas e confiáveis</li>
+                </ul>
+                
+                <p>Seja você um cliente procurando por entregas confiáveis ou um entregador em busca de oportunidades, a INBOX Entregas está aqui para ajudar!</p>
+            </div>
+            
+            <a href="index.html" class="back-button">Voltar para Home</a>
+        </div>
+    </div>
+</body>
+</html> 

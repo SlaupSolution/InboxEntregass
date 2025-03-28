@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contato - INBOX Entregas</title>
+    <style>
+        :root {
+            --primary: #ffde59;
+            --dark: #222222;
+            --gray: #f5f5f5;
+            --white: #ffffff;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+            --blue: #3366ff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--gray);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background-color: var(--primary);
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        
+        .contact-card {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+        
+        .contact-title {
+            font-size: 2rem;
+            color: var(--dark);
+            margin-bottom: 20px;
+        }
+        
+        .contact-info {
+            margin: 30px 0;
+            font-size: 1.2rem;
+            color: #666;
+        }
+        
+        .whatsapp-button {
+            display: inline-block;
+            background-color: #25D366;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin: 20px 0;
+            transition: background-color 0.3s;
+        }
+        
+        .whatsapp-button:hover {
+            background-color: #128C7E;
+        }
+        
+        .contact-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        
+        .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: var(--dark);
+            color: var(--white);
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        
+        .back-button:hover {
+            background-color: #444;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>INBOX Entregas</h1>
+    </div>
+    
+    <div class="container">
+        <div class="contact-card">
+            <div class="contact-icon">📱</div>
+            <h2 class="contact-title">Entre em Contato</h2>
+            <p class="contact-info">Estamos prontos para atender você!</p>
+            
+            <a href="https://wa.me/5575998441349" class="whatsapp-button" target="_blank">
+                <span>💬 Falar no WhatsApp</span>
+            </a>
+            
+            <p class="contact-info">
+                <strong>Telefone:</strong> (75) 99844-1349
+            </p>
+            
+            <p class="contact-info">
+                Horário de Atendimento:<br>
+                Segunda a Sexta: 08h às 18h<br>
+                Sábado: 08h às 12h
+            </p>
+            
+            <a href="index.html" class="back-button">Voltar para Home</a>
+        </div>
+    </div>
+</body>
+</html> 
