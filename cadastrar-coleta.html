@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastrar Coleta - INBOX Entregas</title>
+    <style>
+        :root {
+            --primary: #ffde59;
+            --dark: #222222;
+            --gray: #f5f5f5;
+            --white: #ffffff;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+            --blue: #3366ff;
+            --red: #ff3333;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--gray);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .form-container {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+        
+        .title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--dark);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--dark);
+            color: var(--white);
+        }
+        
+        .btn-danger {
+            background-color: var(--red);
+            color: var(--white);
+        }
+        
+        .btn-danger:hover {
+            background-color: #cc0000;
+        }
+        
+        .coletas-list {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+        
+        .coleta-item {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .coleta-info h3 {
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
+        
+        .coleta-info p {
+            color: #666;
+            margin: 5px 0;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const SUPABASE_URL = "https://awbtsseratdujnjxncii.supabase.co";
+            const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3YnRzc2VyYXRkdWpuanhuY2lpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI0MjIxNDgsImV4cCI6MjA1Nzk5ODE0OH0.SMOziWy5bknJoHjeTceGev233888xhumygRgGisRylY";
+            const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+            // Carregar coletas existentes
+            async function carregarColetas() {
+                try {
+                    const { data, error } = await supabase
+                        .from('coletas')
+                        .select('*')
+                        .order('data_criacao', { ascending: false });
+
+                    if (error) throw error;
+
+                    const listaColetas = document.getElementById('coletas-list');
+                    listaColetas.innerHTML = '';
+
+                    data.forEach(coleta => {
+                        const coletaElement = document.createElement('div');
+                        coletaElement.className = 'coleta-item';
+                        coletaElement.innerHTML = `
+                            <div class="coleta-info">
+                                <h3>${coleta.titulo}</h3>
+                                <p><strong>Descrição:</strong> ${coleta.descricao}</p>
+                                <p><strong>Local de Coleta:</strong> ${coleta.local_coleta}</p>
+                                <p><strong>Local de Entrega:</strong> ${coleta.local_entrega}</p>
+                            </div>
+                            <button class="btn btn-danger" onclick="deletarColeta('${coleta.id}')">Deletar</button>
+                        `;
+                        listaColetas.appendChild(coletaElement);
+                    });
+                } catch (error) {
+                    console.error('Erro ao carregar coletas:', error);
+                    alert('Erro ao carregar coletas: ' + error.message);
+                }
+            }
+
+            // Cadastrar nova coleta
+            window.handleSubmit = async function(event) {
+                event.preventDefault();
+                
+                const titulo = document.getElementById('titulo').value;
+                const descricao = document.getElementById('descricao').value;
+                const localColeta = document.getElementById('localColeta').value;
+                const localEntrega = document.getElementById('localEntrega').value;
+                
+                try {
+                    const { error } = await supabase
+                        .from('coletas')
+                        .insert([{
+                            titulo,
+                            descricao,
+                            local_coleta: localColeta,
+                            local_entrega: localEntrega,
+                            data_criacao: new Date().toISOString()
+                        }]);
+                    
+                    if (error) throw error;
+                    
+                    alert('Coleta cadastrada com sucesso!');
+                    document.getElementById('form-coleta').reset();
+                    carregarColetas();
+                    
+                } catch (error) {
+                    console.error('Erro ao cadastrar coleta:', error);
+                    alert('Erro ao cadastrar coleta: ' + error.message);
+                }
+            }
+
+            // Deletar coleta
+            window.deletarColeta = async function(id) {
+                if (confirm('Tem certeza que deseja deletar esta coleta?')) {
+                    try {
+                        const { error } = await supabase
+                            .from('coletas')
+                            .delete()
+                            .eq('id', id);
+                        
+                        if (error) throw error;
+                        
+                        alert('Coleta deletada com sucesso!');
+                        carregarColetas();
+                        
+                    } catch (error) {
+                        console.error('Erro ao deletar coleta:', error);
+                        alert('Erro ao deletar coleta: ' + error.message);
+                    }
+                }
+            }
+
+            // Carregar coletas ao iniciar a página
+            carregarColetas();
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <h1 class="title">Cadastrar Nova Coleta</h1>
+            <form id="form-coleta" onsubmit="handleSubmit(event)">
+                <div class="form-group">
+                    <label for="titulo" class="form-label">Título</label>
+                    <input type="text" id="titulo" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="descricao" class="form-label">Descrição</label>
+                    <textarea id="descricao" class="form-control" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="localColeta" class="form-label">Local de Coleta</label>
+                    <input type="text" id="localColeta" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="localEntrega" class="form-label">Local de Entrega</label>
+                    <input type="text" id="localEntrega" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Cadastrar Coleta</button>
+            </form>
+        </div>
+
+        <div class="coletas-list">
+            <h2 class="title">Coletas Cadastradas</h2>
+            <div id="coletas-list">
+                <!-- As coletas serão inseridas aqui dinamicamente -->
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

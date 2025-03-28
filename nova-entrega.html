@@ -95,6 +95,39 @@
             display: none;
             z-index: 1000;
         }
+
+        .success-message {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .success-message h2 {
+            color: #4caf50;
+            margin-bottom: 20px;
+        }
+
+        .success-message p {
+            margin-bottom: 15px;
+            color: #666;
+        }
+
+        .item-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn-secondary {
+            background-color: var(--gray);
+            color: var(--dark);
+            border: 1px solid #ddd;
+            width: auto;
+            margin-top: 10px;
+        }
+
+        .btn-secondary:hover {
+            background-color: #e5e5e5;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
@@ -123,36 +156,39 @@
                     if (descricao) {
                         itens.push({
                             descricao,
-                            quantidade
+                            quantidade: parseInt(quantidade)
                         });
                     }
                 });
                 
                 const novaEntrega = {
-                    cliente: {
-                        nome: nomeCliente,
-                        telefone: telefone
-                    },
-                    enderecoColeta,
-                    enderecoEntrega,
-                    itens,
-                    observacoes,
+                    nome_cliente: nomeCliente,
+                    telefone: telefone,
+                    endereco_coleta: enderecoColeta,
+                    endereco_entrega: enderecoEntrega,
+                    itens: itens,
+                    observacoes: observacoes,
                     status: "Pendente",
-                    data: new Date().toLocaleDateString('pt-BR')
+                    data_criacao: new Date().toISOString()
                 };
                 
                 try {
-                    const { error } = await supabase
+                    const { data, error } = await supabase
                         .from('entregas')
-                        .insert([novaEntrega]);
+                        .insert([novaEntrega])
+                        .select();
                     
                     if (error) throw error;
                     
-                    showNotification('Entrega criada com sucesso!');
-                    document.getElementById('sheetdb-form').submit(); // Envia os dados para o SheetDB
-                    setTimeout(() => {
-                        window.location.href = 'entregas-disponiveis.html';
-                    }, 2000);
+                    // Mostrar tela de agradecimento
+                    document.querySelector('.container').innerHTML = `
+                        <div class="success-message">
+                            <h2>Obrigado!</h2>
+                            <p>Sua entrega foi cadastrada com sucesso!</p>
+                            <p>Número de rastreamento: #${data[0].id}</p>
+                            <button class="btn" onclick="window.location.href='index.html'">Voltar para Home</button>
+                        </div>
+                    `;
                     
                 } catch (error) {
                     console.error('Erro ao criar entrega:', error);
@@ -160,13 +196,16 @@
                 }
             }
 
-            function showNotification(message) {
-                const notification = document.getElementById('notification');
-                notification.textContent = message;
-                notification.style.display = 'block';
-                setTimeout(() => {
-                    notification.style.display = 'none';
-                }, 3000);
+            // Função para adicionar novos itens
+            window.adicionarItem = function() {
+                const container = document.getElementById('itensContainer');
+                const novaLinha = document.createElement('div');
+                novaLinha.className = 'item-row';
+                novaLinha.innerHTML = `
+                    <input type="text" class="form-control item-description" placeholder="Descrição do item">
+                    <input type="number" class="form-control item-quantity" value="1" min="1">
+                `;
+                container.appendChild(novaLinha);
             }
         });
     </script>
@@ -175,38 +214,37 @@
     <div class="notification" id="notification"></div>
     <div class="container">
         <h1 class="title">Nova Entrega</h1>
-        <form id="sheetdb-form" action="https://sheetdb.io/api/v1/apg9vpi656ts8" method="post" onsubmit="handleSubmit(event)">
+        <form onsubmit="handleSubmit(event)">
             <div class="form-group">
                 <label for="nomeCliente" class="form-label">Nome do Cliente</label>
-                <input type="text" id="nomeCliente" name="Nome do Cliente" class="form-control" required>
+                <input type="text" id="nomeCliente" class="form-control" required>
             </div>
             <div class="form-group">
                 <label for="telefone" class="form-label">Telefone</label>
-                <input type="tel" id="telefone" name="Telefone" class="form-control" required>
+                <input type="tel" id="telefone" class="form-control" required>
             </div>
             <div class="form-group">
                 <label for="enderecoColeta" class="form-label">Endereço de Coleta</label>
-                <input type="text" id="enderecoColeta" name="Endereço de Coleta" class="form-control" required>
+                <input type="text" id="enderecoColeta" class="form-control" required>
             </div>
             <div class="form-group">
                 <label for="enderecoEntrega" class="form-label">Endereço de Entrega</label>
-                <input type="text" id="enderecoEntrega" name="Endereço de Entrega" class="form-control" required>
+                <input type="text" id="enderecoEntrega" class="form-control" required>
             </div>
             <div class="form-group">
                 <label for="observacoes" class="form-label">Observações</label>
-                <textarea id="observacoes" name="Observações" class="form-control"></textarea>
+                <textarea id="observacoes" class="form-control"></textarea>
             </div>
             <div class="form-group">
                 <label class="form-label">Itens</label>
                 <div id="itensContainer">
                     <div class="item-row">
-                        <input type="text" class="form-control item-description" placeholder="Descrição do item" name="Descrição do Item">
-                        <input type="number" class="form-control item-quantity" value="1" min="1" name="Quantidade">
+                        <input type="text" class="form-control item-description" placeholder="Descrição do item">
+                        <input type="number" class="form-control item-quantity" value="1" min="1">
                     </div>
                 </div>
-                <button type="button" onclick="adicionarItem()">Adicionar Item</button>
+                <button type="button" class="btn btn-secondary" onclick="adicionarItem()">Adicionar Item</button>
             </div>
-            <input type="hidden" name="Created" value="x-sheetmonkey-current-date-time" />
             <button type="submit" class="btn">Criar Entrega</button>
         </form>
     </div>
