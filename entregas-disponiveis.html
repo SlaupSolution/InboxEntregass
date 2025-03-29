@@ -12,6 +12,7 @@
             --white: #ffffff;
             --shadow: 0 4px 8px rgba(0,0,0,0.1);
             --blue: #3366ff;
+            --red: #ff3333;
         }
         
         * {
@@ -174,8 +175,68 @@
         .status-link:hover {
             text-decoration: underline;
         }
+        
+        .list-container {
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-top: 20px;
+        }
+        
+        .entrega-item {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .entrega-item:last-child {
+            border-bottom: none;
+        }
+        
+        .entrega-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .entrega-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--dark);
+        }
+        
+        .entrega-status {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 14px;
+            background-color: var(--primary);
+        }
+        
+        .entrega-details {
+            margin: 10px 0;
+        }
+        
+        .entrega-info {
+            margin: 5px 0;
+            color: #666;
+        }
+        
+        .entrega-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn-edit {
+            background-color: var(--primary);
+        }
+        
+        .btn-delete {
+            background-color: var(--red);
+            color: white;
+        }
     </style>
-    <script src="https://sheetdb.io/handlebars.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -184,21 +245,86 @@
             const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3YnRzc2VyYXRkdWpuanhuY2lpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI0MjIxNDgsImV4cCI6MjA1Nzk5ODE0OH0.SMOziWy5bknJoHjeTceGev233888xhumygRgGisRylY";
             const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+            // Adicionar helper para formatação de data
+            Handlebars.registerHelper('formatDate', function(date) {
+                return new Date(date).toLocaleString('pt-BR');
+            });
+
+            // Função para editar entrega
+            window.editarEntrega = async function(id) {
+                try {
+                    const { data, error } = await supabase
+                        .from('entregas')
+                        .select('*')
+                        .eq('id', id)
+                        .single();
+
+                    if (error) throw error;
+
+                    // Aqui você pode implementar a lógica de edição
+                    // Por exemplo, abrir um modal com um formulário
+                    alert('Função de edição será implementada em breve.');
+                } catch (error) {
+                    console.error('Erro ao editar:', error);
+                    alert('Erro ao editar entrega: ' + error.message);
+                }
+            }
+
+            // Função para deletar entrega
+            window.deletarEntrega = async function(id) {
+                if (confirm('Tem certeza que deseja deletar esta entrega?')) {
+                    try {
+                        const { error } = await supabase
+                            .from('entregas')
+                            .delete()
+                            .eq('id', id);
+
+                        if (error) throw error;
+
+                        alert('Entrega deletada com sucesso!');
+                        carregarEntregas();
+                    } catch (error) {
+                        console.error('Erro ao deletar:', error);
+                        alert('Erro ao deletar entrega: ' + error.message);
+                    }
+                }
+            }
+
+            // Função para aceitar entrega
+            window.aceitarEntrega = async function(id) {
+                try {
+                    const { error } = await supabase
+                        .from('entregas')
+                        .update({ status: 'Em andamento' })
+                        .eq('id', id);
+
+                    if (error) throw error;
+
+                    alert('Entrega aceita com sucesso!');
+                    carregarEntregas();
+                } catch (error) {
+                    console.error('Erro ao aceitar entrega:', error);
+                    alert('Erro ao aceitar entrega: ' + error.message);
+                }
+            }
+
+            // Atualizar a função de carregar entregas
             async function carregarEntregas() {
                 try {
                     const { data, error } = await supabase
                         .from('entregas')
-                        .select('*');
+                        .select('*')
+                        .order('data_criacao', { ascending: false });
 
                     if (error) throw error;
 
                     const source = document.getElementById('entregas-template').innerHTML;
                     const template = Handlebars.compile(source);
-                    const context = { entregas: data };
-                    const html = template(context);
+                    const html = template({ entregas: data });
                     document.getElementById('entregas-container').innerHTML = html;
                 } catch (error) {
-                    console.error('Erro ao buscar entregas:', error);
+                    console.error('Erro ao carregar entregas:', error);
+                    alert('Erro ao carregar entregas: ' + error.message);
                 }
             }
 
@@ -248,24 +374,33 @@
             Voltar para Dashboard
         </a>
         
-        <div id="entregas-container" class="cards-container">
+        <div id="entregas-container" class="list-container">
             <!-- Entregas serão renderizadas aqui -->
         </div>
     </div>
 
-    <!-- Template Handlebars -->
+    <!-- Template Handlebars atualizado -->
     <script id="entregas-template" type="text/x-handlebars-template">
         {{#each entregas}}
-        <div class="card">
-            <h3 class="card-title">Entrega #{{@index}}</h3>
-            <p class="card-info"><strong>Cliente:</strong> {{Nome do Cliente}}</p>
-            <p class="card-info"><strong>Telefone:</strong> {{Telefone}}</p>
-            <p class="card-info"><strong>Endereço de Coleta:</strong> {{Endereço de Coleta}}</p>
-            <p class="card-info"><strong>Endereço de Entrega:</strong> {{Endereço de Entrega}}</p>
-            <p class="card-info"><strong>Data:</strong> {{Created}}</p>
-            <p class="card-info"><strong>Status:</strong> <a href="#" class="status-link">{{status}}</a></p>
-            <div class="card-actions">
-                <button class="btn btn-primary">Aceitar Entrega</button>
+        <div class="entrega-item">
+            <div class="entrega-header">
+                <h3 class="entrega-title">Entrega #{{id}}</h3>
+                <span class="entrega-status">{{status}}</span>
+            </div>
+            <div class="entrega-details">
+                <p class="entrega-info"><strong>Cliente:</strong> {{nome_cliente}}</p>
+                <p class="entrega-info"><strong>Telefone:</strong> {{telefone}}</p>
+                <p class="entrega-info"><strong>Coleta:</strong> {{endereco_coleta}}</p>
+                <p class="entrega-info"><strong>Entrega:</strong> {{endereco_entrega}}</p>
+                <p class="entrega-info"><strong>Data:</strong> {{formatDate data_criacao}}</p>
+                {{#if observacoes}}
+                <p class="entrega-info"><strong>Observações:</strong> {{observacoes}}</p>
+                {{/if}}
+            </div>
+            <div class="entrega-actions">
+                <button class="btn btn-edit" onclick="editarEntrega({{id}})">Editar</button>
+                <button class="btn btn-delete" onclick="deletarEntrega({{id}})">Deletar</button>
+                <button class="btn btn-primary" onclick="aceitarEntrega({{id}})">Aceitar Entrega</button>
             </div>
         </div>
         {{/each}}
