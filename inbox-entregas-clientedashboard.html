@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inbox Entregas - Dashboard do Cliente</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-gray: #f8f9fa;
+            --gray: #e9ecef;
+            --text-dark: #343a40;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-gray);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        h1 {
+            font-size: 24px;
+        }
+        
+        .loader {
+            display: flex;
+            justify-content: center;
+            padding: 40px 0;
+        }
+        
+        .loader:after {
+            content: " ";
+            display: block;
+            width: 64px;
+            height: 64px;
+            margin: 8px;
+            border-radius: 50%;
+            border: 6px solid var(--secondary-color);
+            border-color: var(--secondary-color) transparent var(--secondary-color) transparent;
+            animation: loader 1.2s linear infinite;
+        }
+        
+        @keyframes loader {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .data-container {
+            display: none;
+        }
+        
+        .client-info {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .client-info h2 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--gray);
+        }
+        
+        .client-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .info-group {
+            margin-bottom: 10px;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--secondary-color);
+        }
+        
+        .delivery-info {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .delivery-info h2 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--gray);
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .status-pending {
+            background-color: #ffeeba;
+            color: #856404;
+        }
+        
+        .status-shipped {
+            background-color: #b8daff;
+            color: #004085;
+        }
+        
+        .status-delivered {
+            background-color: #c3e6cb;
+            color: #155724;
+        }
+        
+        .status-cancelled {
+            background-color: #f5c6cb;
+            color: #721c24;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: left;
+            padding: 12px;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--gray);
+        }
+        
+        tr:hover {
+            background-color: var(--light-gray);
+        }
+        
+        .error-message {
+            display: none;
+            color: var(--accent-color);
+            text-align: center;
+            padding: 40px;
+            border: 1px solid var(--accent-color);
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Inbox Entregas - Dashboard do Cliente</h1>
+            <div id="login-info">Carregando...</div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div id="loader" class="loader"></div>
+        
+        <div id="error-message" class="error-message">
+            <h2>Erro ao carregar dados</h2>
+            <p>Não foi possível conectar com a API ou obter os dados solicitados. Por favor, verifique suas credenciais e tente novamente.</p>
+        </div>
+        
+        <div id="data-container" class="data-container">
+            <div class="client-info">
+                <h2>Informações do Cliente</h2>
+                <div class="client-details">
+                    <div>
+                        <div class="info-group">
+                            <div class="info-label">Nome do Cliente:</div>
+                            <div id="client-name">Carregando...</div>
+                        </div>
+                        <div class="info-group">
+                            <div class="info-label">CNPJ/CPF:</div>
+                            <div id="client-document">Carregando...</div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="info-group">
+                            <div class="info-label">Cidade:</div>
+                            <div id="client-city">Carregando...</div>
+                        </div>
+                        <div class="info-group">
+                            <div class="info-label">Estado:</div>
+                            <div id="client-state">Carregando...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="delivery-info">
+                <h2>Informações de Entrega</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Pedido</th>
+                            <th>NF</th>
+                            <th>Data</th>
+                            <th>Produto</th>
+                            <th>Valor</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="delivery-table">
+                        <!-- Dados serão inseridos dinamicamente pelo JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const apiParams = {
+                usuario: 'inboxexpress-prod',
+                senha: 'qoQusU6Q',
+                reid: '64322'
+            };
+            
+            // Atualiza as informações de login no cabeçalho
+            document.getElementById('login-info').textContent = `Usuário: ${apiParams.usuario} | REID: ${apiParams.reid}`;
+            
+            // Função para buscar dados da API
+            async function fetchData() {
+                try {
+                    // Esta é uma simulação de chamada à API, já que não podemos fazer requisições reais aqui
+                    // Em uma implementação real, você usaria fetch() ou axios para chamar a API
+                    
+                    // Simulando um atraso para representar a chamada à API
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    
+                    // Dados simulados - na implementação real, esses dados viriam da API
+                    const data = {
+                        cliente: {
+                            nome: "Distribuidora ABC Ltda",
+                            documento: "12.345.678/0001-90",
+                            cidade: "São Paulo",
+                            estado: "SP"
+                        },
+                        entregas: [
+                            {
+                                pedido: "PED-001234",
+                                notaFiscal: "NF-5678",
+                                data: "02/04/2025",
+                                produto: "Kit Filtros Automotivos",
+                                valor: "R$ 1.250,00",
+                                status: "entregue"
+                            },
+                            {
+                                pedido: "PED-001235",
+                                notaFiscal: "NF-5679",
+                                data: "03/04/2025",
+                                produto: "Óleo Motor Premium",
+                                valor: "R$ 850,00",
+                                status: "em_transito"
+                            },
+                            {
+                                pedido: "PED-001236",
+                                notaFiscal: "NF-5680",
+                                data: "03/04/2025",
+                                produto: "Peças Suspensão",
+                                valor: "R$ 2.340,00",
+                                status: "pendente"
+                            }
+                        ]
+                    };
+                    
+                    // Exibe os dados do cliente
+                    document.getElementById('client-name').textContent = data.cliente.nome;
+                    document.getElementById('client-document').textContent = data.cliente.documento;
+                    document.getElementById('client-city').textContent = data.cliente.cidade;
+                    document.getElementById('client-state').textContent = data.cliente.estado;
+                    
+                    // Exibe os dados de entrega
+                    const deliveryTable = document.getElementById('delivery-table');
+                    deliveryTable.innerHTML = '';
+                    
+                    data.entregas.forEach(entrega => {
+                        const row = document.createElement('tr');
+                        
+                        // Define a classe CSS para o status
+                        let statusClass = '';
+                        let statusText = '';
+                        
+                        switch(entrega.status) {
+                            case 'pendente':
+                                statusClass = 'status-pending';
+                                statusText = 'Pendente';
+                                break;
+                            case 'em_transito':
+                                statusClass = 'status-shipped';
+                                statusText = 'Em Trânsito';
+                                break;
+                            case 'entregue':
+                                statusClass = 'status-delivered';
+                                statusText = 'Entregue';
+                                break;
+                            case 'cancelado':
+                                statusClass = 'status-cancelled';
+                                statusText = 'Cancelado';
+                                break;
+                            default:
+                                statusClass = 'status-pending';
+                                statusText = entrega.status;
+                        }
+                        
+                        row.innerHTML = `
+                            <td>${entrega.pedido}</td>
+                            <td>${entrega.notaFiscal}</td>
+                            <td>${entrega.data}</td>
+                            <td>${entrega.produto}</td>
+                            <td>${entrega.valor}</td>
+                            <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        `;
+                        
+                        deliveryTable.appendChild(row);
+                    });
+                    
+                    // Esconde o loader e mostra os dados
+                    document.getElementById('loader').style.display = 'none';
+                    document.getElementById('data-container').style.display = 'block';
+                    
+                } catch (error) {
+                    console.error('Erro ao buscar dados:', error);
+                    document.getElementById('loader').style.display = 'none';
+                    document.getElementById('error-message').style.display = 'block';
+                }
+            }
+            
+            // Iniciar busca de dados
+            fetchData();
+        });
+    </script>
+</body>
+</html>
