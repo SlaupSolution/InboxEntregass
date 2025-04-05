@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Total Express - Entregas Recentes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .no-data {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        .back-button {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            padding: 10px;
+            background-color: #3498db;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .back-button:hover {
+            background-color: #2980b9;
+        }
+        .status-pendente {
+            color: #e67e22;
+            font-weight: bold;
+        }
+        .status-transito {
+            color: #f1c40f;
+            font-weight: bold;
+        }
+        .status-entregue {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Entregas Recentes</h1>
+        
+        <div id="deliveries-container">
+            <!-- Tabela será preenchida via JavaScript -->
+        </div>
+        
+        <a href="consumidor.html" class="back-button">Nova Consulta</a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const deliveriesData = JSON.parse(localStorage.getItem('deliveriesData'));
+            const container = document.getElementById('deliveries-container');
+            
+            if (!deliveriesData || deliveriesData.length === 0) {
+                container.innerHTML = '<div class="no-data">Nenhuma entrega encontrada</div>';
+                return;
+            }
+            
+            const table = document.createElement('table');
+            const thead = document.createElement('thead');
+            const tbody = document.createElement('tbody');
+            
+            // Cabeçalho da tabela
+            thead.innerHTML = `
+                <tr>
+                    <th>Número</th>
+                    <th>Destinatário</th>
+                    <th>Local</th>
+                    <th>Status</th>
+                    <th>Data</th>
+                    <th>Última Atualização</th>
+                </tr>
+            `;
+            
+            // Linhas da tabela
+            deliveriesData.forEach(delivery => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${delivery.codigo || 'N/A'}</td>
+                    <td>${delivery.nome || 'N/A'}</td>
+                    <td>${delivery.local || 'N/A'}</td>
+                    <td class="status-${getStatusClass(delivery.status)}">${delivery.status || 'N/A'}</td>
+                    <td>${delivery.data || 'N/A'}</td>
+                    <td>${delivery.ultimaAtualizacao || 'N/A'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            table.appendChild(thead);
+            table.appendChild(tbody);
+            container.appendChild(table);
+            
+            // Limpa os dados após exibição
+            localStorage.removeItem('deliveriesData');
+        });
+        
+        function getStatusClass(status) {
+            if (!status) return '';
+            
+            if (status.toLowerCase().includes('pendente')) return 'pendente';
+            if (status.toLowerCase().includes('trânsito') || status.toLowerCase().includes('transito')) return 'transito';
+            if (status.toLowerCase().includes('entregue')) return 'entregue';
+            return '';
+        }
+    </script>
+</body>
+</html>

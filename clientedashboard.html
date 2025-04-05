@@ -6,8 +6,8 @@
     <title>Inbox Entregas - Dashboard do Cliente</title>
     <style>
         :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #3498db;
+            --primary-color: #1d2024;
+            --secondary-color: #ffee00;
             --accent-color: #e74c3c;
             --light-gray: #f8f9fa;
             --gray: #e9ecef;
@@ -254,13 +254,13 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const apiParams = {
-                usuario: 'inboxexpress-prod',
+                usuario: '-dristribuidoraod',
                 senha: 'qoQusU6Q',
                 reid: '64322'
             };
             
             // Atualiza as informações de login no cabeçalho
-            document.getElementById('login-info').textContent = `Usuário: ${apiParams.usuario} | REID: ${apiParams.reid}`;
+            document.getElementById('login-info').textContent = `Usuário: ${} | REID: ${apiParams.reid}`;
             
             // Função para buscar dados da API
             async function fetchData() {

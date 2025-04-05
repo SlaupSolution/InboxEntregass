@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Total Express API Interface</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        textarea {
+            min-height: 200px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #response {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .error {
+            color: #d32f2f;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .example {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        .example pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            background: #fff;
+            padding: 10px;
+            border-radius: 3px;
+            border: 1px solid #ddd;
+        }
+        .example h4 {
+            margin-top: 0;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Total Express API Interface</h1>
+        
+        <div class="form-group">
+            <label for="soapBody">SOAP Request Body:</label>
+            <textarea id="soapBody" placeholder="Enter SOAP request body here...">
+<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <soap:Body>
+        <!-- Insert your SOAP request here -->
+    </soap:Body>
+</soap:Envelope>
+            </textarea>
+        </div>
+
+        <div class="button-group">
+            <button id="sendRequest">Send SOAP Request</button>
+            <button id="loadExample">Load Example Request</button>
+        </div>
+
+        <div class="form-group" id="examples" style="display: none;">
+            <h3>Example SOAP Requests:</h3>
+            <div class="example">
+                <h4>Track Package:</h4>
+                <pre>
+<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <soap:Body>
+        <rastreamento xmlns="http://edi.totalexpress.com.br">
+            <numeroColeta>123456789</numeroColeta>
+        </rastreamento>
+    </soap:Body>
+</soap:Envelope></pre>
+            </div>
+            <div class="example">
+                <h4>Create Shipment:</h4>
+                <pre>
+<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <soap:Body>
+        <coleta xmlns="http://edi.totalexpress.com.br">
+            <remetente>
+                <nome>Remetente Exemplo</nome>
+                <documento>12345678900</documento>
+            </remetente>
+            <destinatario>
+                <nome>Destinatário Exemplo</nome>
+            </destinatario>
+        </coleta>
+    </soap:Body>
+</soap:Envelope></pre>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>API Response:</label>
+            <div id="response">Response will appear here...</div>
+            
+            <div id="deliveries-table" style="margin-top: 20px; display: none;">
+                <h3>Entregas Recentes</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Local</th>
+                            <th>Status</th>
+                            <th>Data</th>
+                            <th>Código</th>
+                        </tr>
+                    </thead>
+                    <tbody id="deliveries-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('sendRequest').addEventListener('click', sendSoapRequest);
+
+        async function sendSoapRequest() {
+            const soapBody = document.getElementById('soapBody').value;
+            const responseDiv = document.getElementById('response');
+            const deliveriesTable = document.getElementById('deliveries-table');
+            const deliveriesBody = document.getElementById('deliveries-body');
+            
+            responseDiv.innerHTML = "Sending request...";
+            responseDiv.className = "";
+            deliveriesTable.style.display = 'none';
+            deliveriesBody.innerHTML = '';
+
+            try {
+                const response = await axios.post(
+                    'http://localhost:3000/api/total-express',
+                    { soapBody }
+                );
+
+                const { deliveries, rawResponse } = response.data;
+                
+                // Display raw response
+                if (typeof rawResponse === 'object') {
+                    responseDiv.innerHTML = JSON.stringify(rawResponse, null, 2);
+                } else {
+                    responseDiv.innerHTML = rawResponse;
+                }
+
+                // Display formatted deliveries
+                if (deliveries && deliveries.length > 0) {
+                    deliveriesTable.style.display = 'block';
+                    deliveries.forEach(delivery => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${delivery.nome}</td>
+                            <td>${delivery.local}</td>
+                            <td>${delivery.status}</td>
+                            <td>${delivery.data}</td>
+                            <td>${delivery.codigo}</td>
+                        `;
+                        deliveriesBody.appendChild(row);
+                    });
+                }
+            } catch (error) {
+                responseDiv.className = "error";
+                if (error.response) {
+                    responseDiv.innerHTML = `Error: ${error.response.status}\n${error.response.data}`;
+                } else if (error.request) {
+                    responseDiv.innerHTML = "Error: No response received from server";
+                } else {
+                    responseDiv.innerHTML = `Error: ${error.message}`;
+                }
+                console.error('Error:', error);
+            }
+        }
+    </script>
+</body>
+</html>
