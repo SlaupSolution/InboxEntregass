@@ -146,7 +146,7 @@ function formatResponseData(xmlData) {
         }
     }
     
-    return { deliveries, rawResponse: xmlData };
+    return deliveries;
 }
 
 app.listen(port, () => {
