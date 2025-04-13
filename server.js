@@ -79,6 +79,41 @@ app.post('/api/register-delivery', async (req, res) => {
     }
 });
 
+// Endpoint to check delivery status by tracking code
+app.get('/api/track/:trackingCode', async (req, res) => {
+    try {
+        const { trackingCode } = req.params;
+        
+        if (!mongoConnected) {
+            return res.status(503).json({
+                error: 'Service unavailable',
+                message: 'MongoDB not connected - tracking unavailable'
+            });
+        }
+
+        const delivery = await Delivery.findOne({ trackingCode });
+        
+        if (!delivery) {
+            return res.status(404).json({
+                error: 'Not found',
+                message: 'No delivery found with this tracking code'
+            });
+        }
+
+        res.json({
+            trackingCode: delivery.trackingCode,
+            status: delivery.status,
+            origem: delivery.localColeta,
+            destino: delivery.localEntrega,
+            dataRegistro: delivery.createdAt,
+            ultimaAtualizacao: new Date()
+        });
+    } catch (error) {
+        console.error('Error tracking delivery:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // National delivery quote endpoint
 app.post('/api/national-quote', async (req, res) => {
     try {

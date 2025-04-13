@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rastreamento de Entrega</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        .status {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .info-row {
+            display: flex;
+            margin-bottom: 5px;
+        }
+        .info-label {
+            width: 120px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Rastreamento de Entrega</h1>
+    <div class="form-group">
+        <label for="trackingCode">Código de Rastreio:</label>
+        <input type="text" id="trackingCode" placeholder="Digite o código de rastreio">
+        <button onclick="trackDelivery()">Rastrear</button>
+    </div>
+    <div id="result" class="result" style="display: none;">
+        <div class="status" id="status"></div>
+        <div class="info-row">
+            <div class="info-label">Código:</div>
+            <div id="trackingCodeResult"></div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Origem:</div>
+            <div id="origem"></div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Destino:</div>
+            <div id="destino"></div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Data Registro:</div>
+            <div id="dataRegistro"></div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Última Atualização:</div>
+            <div id="ultimaAtualizacao"></div>
+        </div>
+    </div>
+
+    <script>
+        function trackDelivery() {
+            const trackingCode = document.getElementById('trackingCode').value;
+            if (!trackingCode) {
+                alert('Por favor, digite um código de rastreio');
+                return;
+            }
+
+            fetch(`/api/track/${trackingCode}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro ao buscar informações');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    document.getElementById('result').style.display = 'block';
+                    document.getElementById('status').textContent = `Status: ${data.status}`;
+                    document.getElementById('trackingCodeResult').textContent = data.trackingCode;
+                    document.getElementById('origem').textContent = data.origem;
+                    document.getElementById('destino').textContent = data.destino;
+                    document.getElementById('dataRegistro').textContent = new Date(data.dataRegistro).toLocaleString();
+                    document.getElementById('ultimaAtualizacao').textContent = new Date(data.ultimaAtualizacao).toLocaleString();
+                })
+                .catch(error => {
+                    alert(error.message);
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+</body>
+</html>
