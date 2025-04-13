@@ -3,7 +3,8 @@
     "axios": "^1.8.4",
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "mongoose": "^8.13.2"
   },
   "name": "dashboard-inbox",
   "version": "1.0.0",

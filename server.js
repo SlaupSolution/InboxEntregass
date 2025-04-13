@@ -2,89 +2,141 @@ const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 const app = express();
 const port = 3000;
+
+// MongoDB Connection with better error handling
+let mongoConnected = false;
+
+mongoose.connect('mongodb://localhost:27017/totalexpress')
+.then(() => {
+    console.log('Connected to MongoDB');
+    mongoConnected = true;
+})
+.catch(err => {
+    console.warn('Warning: Could not connect to MongoDB. Some features may be limited.');
+    console.warn('Error details:', err.message);
+});
+
+// Delivery Schema
+const deliverySchema = new mongoose.Schema({
+    nome: String,
+    localColeta: String,
+    localEntrega: String,
+    descricao: String,
+    trackingCode: String,
+    status: { type: String, default: 'Pendente' },
+    createdAt: { type: Date, default: Date.now }
+});
+
+const Delivery = mongoose.model('Delivery', deliverySchema);
 
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-// Endpoint para registro de coleta (existente)
-app.post('/enviar', async (req, res) => {
-    const { nome, cpf, bairro, cidade, estado, telefone, nfeNumero, nfeSerie, nfeData, nfeChave } = req.body;
-
-    const soapRequest = `
-        <?xml version="1.0" encoding="utf-8"?>
-        <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" 
-                       xmlns:ns1="urn:RegistraColeta">
-            <soap:Body>
-                <ns1:RegistraColeta>
-                    <RegistraColetaRequest>
-                        <Encomendas>
-                            <item>
-                                <TipoServico>1</TipoServico>
-                                <TipoEntrega>0</TipoEntrega>
-                                <Volumes>2</Volumes>
-                                <CondFrete>CIF</CondFrete>
-                                <Pedido>763</Pedido>
-                                <IdCliente>1</IdCliente>
-                                <Natureza>Scrubs</Natureza>
-                                <IsencaoIcms>0</IsencaoIcms>
-                                <DestNome>${nome}</DestNome>
-                                <DestCpfCnpj>${cpf}</DestCpfCnpj>
-                                <DestEnd>Endereço padrão</DestEnd>
-                                <DestEndNum>123</DestEndNum>
-                                <DestCompl></DestCompl>
-                                <DestBairro>${bairro}</DestBairro>
-                                <DestCidade>${cidade}</DestCidade>
-                                <DestEstado>${estado}</DestEstado>
-                                <DestCep>60175224</DestCep>
-                                <DestEmail>cliente@email.com</DestEmail>
-                                <DestDdd>85</DestDdd>
-                                <DestTelefone1>${telefone}</DestTelefone1>
-                                <DocFiscalNFe>
-                                    <item>
-                                        <NfeNumero>${nfeNumero}</NfeNumero>
-                                        <NfeSerie>${nfeSerie}</NfeSerie>
-                                        <NfeData>${nfeData}</NfeData>
-                                        <NfeValTotal>1212.55</NfeValTotal>
-                                        <NfeValProd>1217.22</NfeValProd>
-                                        <NfeChave>${nfeChave}</NfeChave>
-                                    </item>
-                                </DocFiscalNFe>
-                            </item>
-                        </Encomendas>
-                    </RegistraColetaRequest>
-                </ns1:RegistraColeta>
-            </soap:Body>
-        </soap:Envelope>
-    `;
-
+// New endpoint for delivery registration
+app.post('/api/register-delivery', async (req, res) => {
     try {
-        const response = await axios.post('https://edi.totalexpress.com.br/soap/webservice_v24.total', soapRequest, {
-            headers: {
-                'Content-Type': 'text/xml; charset=utf-8',
-                'SOAPAction': 'urn:RegistraColeta'
-            }
+        const { nome, localColeta, localEntrega, descricao } = req.body;
+        
+        // Generate tracking code
+        const trackingCode = 'TE' + Date.now().toString().slice(-8);
+        
+        // Create new delivery
+        const newDelivery = new Delivery({
+            nome,
+            localColeta,
+            localEntrega,
+            descricao,
+            trackingCode
         });
-
-        res.json({
-            status: 'success',
-            message: 'Pedido registrado com sucesso!',
-            data: response.data
-        });
+        
+        if (mongoConnected) {
+            // Save to MongoDB if available
+            await newDelivery.save();
+            res.json({
+                success: true,
+                trackingCode,
+                message: 'Entrega registrada com sucesso!'
+            });
+        } else {
+            // Fallback when MongoDB is not available
+            res.json({
+                success: true,
+                trackingCode,
+                message: 'Entrega registrada (sem armazenamento no MongoDB)'
+            });
+        }
     } catch (error) {
-        console.error(error);
+        console.error('Error registering delivery:', error);
         res.status(500).json({
-            status: 'error',
-            message: 'Erro ao registrar pedido.',
-            error: error.message
+            success: false,
+            message: 'Erro ao registrar entrega'
         });
     }
 });
 
-// Novo endpoint para consultas de rastreamento/histórico
+// National delivery quote endpoint
+app.post('/api/national-quote', async (req, res) => {
+    try {
+        const { cepOrigem, cepDestino, peso, dimensoes, tipoServico } = req.body;
+        
+        // Validate required fields
+        if (!cepOrigem || !cepDestino || !peso || !dimensoes) {
+            return res.status(400).json({ error: 'Missing required fields' });
+        }
+
+        // Prepare SOAP request for Total Express API
+        const soapRequest = `
+            <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:web="http://webservice.totalexpress.com.br">
+                <soapenv:Header/>
+                <soapenv:Body>
+                    <web:calculaFrete>
+                        <web:cepOrigem>${cepOrigem}</web:cepOrigem>
+                        <web:cepDestino>${cepDestino}</web:cepDestino>
+                        <web:peso>${peso}</web:peso>
+                        <web:comprimento>${dimensoes.comprimento}</web:comprimento>
+                        <web:largura>${dimensoes.largura}</web:largura>
+                        <web:altura>${dimensoes.altura}</web:altura>
+                        <web:tipoServico>${tipoServico || 'expresso'}</web:tipoServico>
+                    </web:calculaFrete>
+                </soapenv:Body>
+            </soapenv:Envelope>
+        `;
+
+        const response = await axios.post(
+            'https://edi.totalexpress.com.br/webservice24.php?wsdl',
+            soapRequest,
+            {
+                headers: {
+                    'Content-Type': 'text/xml; charset=utf-8',
+                    'SOAPAction': '',
+                    'Raid': '64322'
+                },
+                auth: {
+                    username: 'inboxexpress-prod',
+                    password: 'qoQusU6Q'
+                }
+            }
+        );
+
+        // Parse XML response
+        const parsedResponse = parseQuoteResponse(response.data);
+        res.json(parsedResponse);
+
+    } catch (error) {
+        console.error('Error calculating national quote:', error);
+        res.status(500).json({ 
+            error: 'Erro ao calcular frete nacional',
+            details: error.message 
+        });
+    }
+});
+
+// Existing endpoint for tracking queries
 app.post('/api/total-express', async (req, res) => {
     try {
         const { soapBody } = req.body;
@@ -112,41 +164,16 @@ app.post('/api/total-express', async (req, res) => {
     }
 });
 
-function formatResponseData(xmlData) {
-    const deliveries = [];
-    const now = new Date();
+function parseQuoteResponse(xmlData) {
+    // Extract values from XML response
+    const valorMatch = xmlData.match(/<valor>([^<]+)<\/valor>/);
+    const prazoMatch = xmlData.match(/<prazo>([^<]+)<\/prazo>/);
     
-    if (xmlData.includes('rastreamento')) {
-        deliveries.push({
-            nome: 'Destinatário Exemplo',
-            local: 'Centro de Distribuição - SP',
-            status: 'Em trânsito',
-            data: now.toLocaleDateString(),
-            codigo: `COD${Math.floor(1000 + Math.random() * 9000)}`,
-            ultimaAtualizacao: now.toLocaleString()
-        });
-    } 
-    else if (xmlData.includes('historico')) {
-        const statuses = ['Entregue', 'Em trânsito', 'Pendente'];
-        const cities = ['São Paulo', 'Rio de Janeiro', 'Belo Horizonte', 'Curitiba', 'Porto Alegre'];
-        
-        for (let i = 1; i <= 5; i++) {
-            const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
-            const randomCity = cities[Math.floor(Math.random() * cities.length)];
-            const randomDate = new Date(now - Math.floor(Math.random() * 30 * 24 * 60 * 60 * 1000));
-            
-            deliveries.push({
-                nome: `Cliente ${i}`,
-                local: randomCity,
-                status: randomStatus,
-                data: randomDate.toLocaleDateString(),
-                codigo: `COD${Math.floor(1000 + Math.random() * 9000)}`,
-                ultimaAtualizacao: randomDate.toLocaleString()
-            });
-        }
-    }
-    
-    return deliveries;
+    return {
+        valor: valorMatch ? parseFloat(valorMatch[1]) : 0,
+        prazo: prazoMatch ? parseInt(prazoMatch[1]) : 0,
+        moeda: 'BRL'
+    };
 }
 
 app.listen(port, () => {

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listagem de Entregas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .entregas-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            position: relative;
+        }
+        .card h3 {
+            margin-top: 0;
+            color: #444;
+        }
+        .card p {
+            margin: 8px 0;
+            color: #666;
+        }
+        .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #ff4444;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Entregas Cadastradas</h1>
+    <div class="entregas-container" id="entregasContainer">
+        <!-- Cards serão inseridos aqui via JavaScript -->
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('/entregas');
+                const entregas = await response.json();
+                
+                const container = document.getElementById('entregasContainer');
+                
+                entregas.forEach(entrega => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <button class="delete-btn" data-id="${entrega._id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        <h3>${entrega.titulo}</h3>
+                        <p><strong>Local de Coleta:</strong> ${entrega.localColeta}</p>
+                        <p><strong>Local de Entrega:</strong> ${entrega.localEntrega}</p>
+                        <p><strong>Descrição:</strong> ${entrega.descricao}</p>
+                        <p><small>Cadastrado em: ${new Date(entrega.createdAt).toLocaleString()}</small></p>
+                    `;
+                    container.appendChild(card);
+                });
+
+                // Adiciona event listeners para os botões de exclusão
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const id = e.currentTarget.getAttribute('data-id');
+                        if (confirm('Tem certeza que deseja excluir esta entrega?')) {
+                            try {
+                                await fetch(`/entregas/${id}`, { method: 'DELETE' });
+                                e.currentTarget.closest('.card').remove();
+                            } catch (error) {
+                                console.error('Erro ao excluir entrega:', error);
+                                alert('Erro ao excluir entrega');
+                            }
+                        }
+                    });
+                });
+            } catch (error) {
+                console.error('Erro ao carregar entregas:', error);
+            }
+        });
+    </script>
+</body>
+</html>

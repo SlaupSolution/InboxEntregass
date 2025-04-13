@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cotações e Coletas Nacionais - Total Express</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .form-container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="number"], textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cotações e Coletas Nacionais</h1>
+    <div class="form-container">
+        <form id="cotacaoForm">
+            <div class="form-group">
+                <label for="titulo">Título da Coleta:</label>
+                <input type="text" id="titulo" required>
+            </div>
+            <div class="form-group">
+                <label for="localColeta">Local de Coleta:</label>
+                <input type="text" id="localColeta" required>
+            </div>
+            <div class="form-group">
+                <label for="localEntrega">Local de Entrega:</label>
+                <input type="text" id="localEntrega" required>
+            </div>
+            <div class="form-group">
+                <label for="descricao">Descrição:</label>
+                <textarea id="descricao" required></textarea>
+            </div>
+            <button type="submit">Cadastrar Coleta</button>
+        </form>
+        <div id="response"></div>
+    </div>
+    <script>
+        document.getElementById('cotacaoForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const responseDiv = document.getElementById('response');
+            responseDiv.innerHTML = "Enviando...";
+
+            const formData = {
+                titulo: document.getElementById('titulo').value,
+                localColeta: document.getElementById('localColeta').value,
+                localEntrega: document.getElementById('localEntrega').value,
+                descricao: document.getElementById('descricao').value
+            };
+
+            try {
+                const response = await fetch('/coletas/nacionais', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                const data = await response.json();
+                responseDiv.innerHTML = data.message;
+            } catch (error) {
+                responseDiv.innerHTML = 'Erro ao cadastrar coleta: ' + error.message;
+            }
+        });
+    </script>
+</body>
+</html>
