@@ -82,34 +82,19 @@
             border-radius: 4px;
             margin-bottom: 10px;
         }
-        .search-button, .register-button {
-            padding: 10px 20px;
-            background-color: #ffde59;
-            color: #222;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            margin-top: 5px;
-            width: 80%;
-            max-width: 300px;
-        }
-        .search-button:hover, .register-button:hover {
-            background-color: #222;
-            color: #fff;
-        }
-        .register-button {
-            background-color: #3366ff;
-            color: #fff;
-        }
-        .register-button:hover {
-            background-color: #2952cc;
-        }
         footer {
             background-color: #222;
             color: #fff;
             text-align: center;
             padding: 10px 0;
+        }
+        .image-container {
+            margin: 20px 0;
+        }
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
         }
     </style>
     <script>
@@ -143,12 +128,13 @@
             <p>Use o campo abaixo para rastrear sua entrega.</p>
         </div>
         
+        <div class="image-container">
+            <img src="path/to/your/image.jpg" alt="Descrição da imagem">
+        </div>
+        
         <div class="search-container">
             <input type="text" id="trackingNumber" class="search-input" placeholder="Digite o número de rastreamento">
             <button class="search-button" onclick="trackDelivery()">Rastrear Entrega</button>
-            <button class="register-button" onclick="window.location.href='entregas-disponiveis.html'">Entregas Disponíveis</button>
-            <button class="register-button" onclick="window.location.href='cadastrar-coleta.html'">Cadastrar Delivery</button>
-            <button class="register-button" onclick="window.location.href='cadastro-entregador.html'">Cadastrar Entregador</button>
         </div>
     </div>
     
@@ -156,4 +142,4 @@
         <p>&copy; 2025 INBOX Entregas. Todos os direitos reservados.</p>
     </footer>
 </body>
-</html> 
+</html>
